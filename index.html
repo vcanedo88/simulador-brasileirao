@@ -237,7 +237,10 @@ details.metodo dd{margin:0}
 @media (max-width:600px){.barra.l{grid-template-columns:24px 92px minmax(0,1fr) 40px}.barra.l .pts{display:none}}
 
 /* modo vídeo (#video): um bloco por tela, ampliado para caber na janela (4:3 das artes = 1440 x 1080), ← → para navegar */
-html.modo-video, html.modo-video body{height:100%;overflow:hidden;background:var(--fundo)}
+html.modo-video, html.modo-video body{height:100%;overflow:hidden;background:#111}
+.palco{display:none}
+html.modo-video .palco{display:block;position:fixed;background:var(--fundo);z-index:0}
+html.modo-video .pagina{z-index:1}
 html.modo-video .pagina{position:absolute;width:960px;max-width:none;margin:0;padding:36px 44px 28px;transform-origin:0 0;box-sizing:border-box}
 html.modo-video .tabela-wrap[style*="max-height"]{max-height:330px!important}
 html.modo-video [data-slide]:not(.slide-ativo){display:none!important}
@@ -646,12 +649,16 @@ let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(tud
   const nav = el("div", {class: "video-nav"}), ant = el("button", {type: "button", "aria-label": "Bloco anterior"}, "←"),
         prox = el("button", {type: "button", "aria-label": "Próximo bloco"}, "→"), cont = el("span");
   nav.append(ant, cont, prox); document.body.append(nav);
+  const palco = el("div", {class: "palco"}); document.body.prepend(palco);
   let atual = 0;
   function encaixa() {
     if (!document.documentElement.classList.contains("modo-video")) { pag.style.transform = pag.style.left = pag.style.top = ""; return; }
     pag.style.transform = "none";
-    const h = pag.scrollHeight, vw = innerWidth, vh = innerHeight, s = Math.min(vw / 960, vh / Math.max(h, 600));
-    pag.style.transform = `scale(${s})`; pag.style.left = (vw - 960 * s) / 2 + "px"; pag.style.top = Math.max(0, (vh - h * s) / 2) + "px";
+    // palco 4:3 (o formato das artes, 1440 x 1080) no centro da tela; no OBS, recorte só esse retângulo
+    const vw = innerWidth, vh = innerHeight, PW = Math.min(vw, vh * 4 / 3), PH = PW * 3 / 4, px0 = (vw - PW) / 2, py0 = (vh - PH) / 2;
+    Object.assign(palco.style, {left: px0 + "px", top: py0 + "px", width: PW + "px", height: PH + "px"});
+    const h = pag.scrollHeight, s = Math.min(PW / 960, PH / Math.max(h, 540));
+    pag.style.transform = `scale(${s})`; pag.style.left = px0 + (PW - 960 * s) / 2 + "px"; pag.style.top = py0 + Math.max(0, (PH - h * s) / 2) + "px";
   }
   function mostra(i) {
     atual = (i + slides.length) % slides.length;
