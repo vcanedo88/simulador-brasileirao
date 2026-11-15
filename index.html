@@ -362,6 +362,10 @@ const faixa = v => Math.round(v) <= 38 ? "facil" : Math.round(v) <= 54 ? "medio"
 const NOMEF = {facil: "fácil", medio: "médio", dificil: "difícil", mdificil: "muito difícil"};
 const NS = "http://www.w3.org/2000/svg";
 const sv = (tag, attrs = {}, txt) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (txt != null) e.textContent = txt; return e; };
+const certo = rot => { const s = sv("svg", {viewBox: "0 0 20 20", width: 20, height: 20, role: "img", "aria-label": rot, style: "vertical-align:middle"});
+  s.append(sv("title", {}, rot), sv("circle", {cx: 10, cy: 10, r: 10, fill: "#16DE37"}),
+           sv("path", {d: "M5.5 10.4 8.6 13.4 14.6 6.9", fill: "none", stroke: "#141414", "stroke-width": 2.4, "stroke-linecap": "round", "stroke-linejoin": "round"}));
+  return s; };
 function tipDe(box) {
   let t = box.querySelector(".tip");
   if (!t) { t = el("div", {class: "tip"}); t.hidden = true; box.append(t); }
@@ -459,7 +463,7 @@ tabela("tab44", [...CLUBES], [
   {rot: "", val: r => r.clube, cel: r => clube(r.clube)},
   {rot: "Pts", val: r => r.pontos, n: true},
   {rot: "Jogos", val: r => r.jogos_restantes, n: true},
-  {rot: "Faltam", val: r => r.pontos_ate_44, cel: r => r.pontos_ate_44 ? "+" + r.pontos_ate_44 : el("span", {title: "já tem 44 pontos", "aria-label": "já tem 44 pontos"}, "✅"), n: true, cls: r => r.pontos_ate_44 ? "roxo" : ""},
+  {rot: "Faltam", val: r => r.pontos_ate_44, cel: r => r.pontos_ate_44 ? "+" + r.pontos_ate_44 : certo("já tem 44 pontos"), n: true, cls: r => r.pontos_ate_44 ? "roxo" : ""},
   {rot: "Chance", val: r => r.chance_de_chegar, cel: r => r.chance_de_chegar == null ? "–" : pc(r.chance_de_chegar), n: true},
 ], {i: 1, dir: 1});
 
