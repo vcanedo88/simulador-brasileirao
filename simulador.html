@@ -135,9 +135,9 @@ footer.rodape img{height:40px}
 .tabela-wrap{overflow-x:visible}
 table.ranking{min-width:0;width:100%}
 .ranking th{white-space:normal;line-height:1.15;letter-spacing:.02em;vertical-align:bottom}
-.sim-grade{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px;align-items:start;margin-top:22px}
-.sim-res{position:sticky;top:12px}
-@media (max-width:900px){.sim-grade{grid-template-columns:minmax(0,1fr);gap:28px}.sim-res{position:static;order:-1}}
+.sim-grade{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:36px;align-items:start;margin-top:22px}
+.sim-res{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto;overscroll-behavior:contain;padding-right:4px}
+@media (max-width:900px){.sim-grade{grid-template-columns:minmax(0,1fr);gap:28px}.sim-res{position:static;order:-1;max-height:none;overflow:visible;padding-right:0}}
 .barra-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:14px 0 4px}
 .barra-ctl .cont{font-size:14px;color:var(--texto-2)}
 .barra-ctl .cont b{color:var(--roxo);font-size:18px}
@@ -162,6 +162,15 @@ table.ranking{min-width:0;width:100%}
 .seg button img{width:18px;height:18px;object-fit:contain}
 .seg button .p{font-variant-numeric:tabular-nums;font-weight:700}
 .filtro{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-size:13px;color:var(--texto-2)}
+.sel-esc{position:relative}
+.sel-esc button{display:inline-flex;align-items:center;gap:8px;min-width:190px;font:inherit;font-size:13px;color:var(--texto);background:#fff;border:1px solid var(--cinza);padding:5px 10px;cursor:pointer;text-align:left}
+.sel-esc button::after{content:"▾";margin-left:auto;color:var(--texto-2)}
+.sel-esc ul{position:absolute;left:0;top:calc(100% + 4px);z-index:10;min-width:100%;max-height:340px;overflow-y:auto;margin:0;padding:4px 0;list-style:none;background:#fff;border:1px solid var(--cinza);box-shadow:0 4px 14px rgba(0,0,0,.1)}
+.sel-esc li{display:flex;align-items:center;gap:8px;padding:6px 12px;font-size:13px;color:var(--texto);cursor:pointer;white-space:nowrap}
+.sel-esc li:hover,.sel-esc li.foco{background:var(--s1)}
+.sel-esc li[aria-selected="true"]{font-weight:700;color:var(--roxo)}
+.sel-esc img{width:22px;height:22px;object-fit:contain;flex:none}
+.sel-esc .todos{display:inline-block;width:22px;flex:none}
 .rod-t{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--texto-2);margin:18px 0 2px;padding-bottom:4px;border-bottom:2px solid var(--texto)}
 .jg{padding:9px 0 10px;border-bottom:1px solid var(--linha)}
 .jg.escolhido{background:linear-gradient(90deg,var(--s1),transparent 70%)}
@@ -185,14 +194,21 @@ table.ranking{min-width:0;width:100%}
 .dlt{font-size:11.5px;color:var(--texto-2);font-weight:600;margin-left:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .dlt.sobe{color:var(--roxo)}
 #tabSim{width:100%}
-#tabSim td,#tabSim th{padding:5px 4px}
+#tabSim td,#tabSim th{padding:5px 3px}
+#tabSim th{white-space:nowrap}
+#tabSim .fim{border-left:2px solid var(--texto)}
+#tabSim th.fim{border-left:2px solid var(--texto)}
+#tabSim .mudou{font-weight:700;color:var(--roxo)}
+#tabSim .dlt{display:block;margin:0;line-height:1.1}
+@media (max-width:1150px){#tabSim .gpgc{display:none}}
+@media (max-width:520px){#tabSim .md{display:none}#tabSim .cl .nm{display:none}#tabSim{font-size:12.5px}}
 #tabSim td.n,#tabSim th.n{text-align:right}
 #tabSim tr.z4 td{background:var(--s1)}
 #tabSim tr.corte td{border-bottom:2px solid var(--roxo)}
 #tabSim .cl{display:flex;align-items:center;gap:7px;font-weight:500;white-space:nowrap}
 #tabSim .cl img{width:20px;height:20px;object-fit:contain}
 #tabSim .forte{font-weight:700;color:var(--roxo)}
-#tabSim .pts-f{color:var(--texto-2);font-size:11.5px;display:block;line-height:1}
+#tabSim .pts-f{color:var(--texto-2);font-size:11px;display:block;line-height:1;font-weight:400}
 .calc{font-size:12px;color:var(--texto-2);min-height:16px}
 .ir-res{display:none}
 @media (max-width:900px){.ir-res{display:block;position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;font:700 13px var(--sans);padding:9px 14px;background:var(--roxo);color:#fff;border:0;box-shadow:0 2px 8px rgba(0,0,0,.25)}}
@@ -236,16 +252,16 @@ html.modo-video .abas{display:none}
       </div>
       <h2 id="tJogos" style="margin:0 0 2px">Os jogos que faltam</h2>
       <p class="h2sub" style="margin:0 0 10px">Clique no resultado ou digite o placar (o placar entra no saldo de gols). Em "Modelo", o jogo é sorteado com as chances do índice do canal.</p>
-      <div class="filtro"><label for="selF">Mostrar jogos de</label><select id="selF"></select></div>
+      <div class="filtro"><span id="rotF">Mostrar jogos de</span><div class="sel-esc" id="selF"></div></div>
       <div id="jogos"></div>
     </section>
 
     <section class="sim-res" id="resultado" aria-labelledby="tRes" aria-live="polite">
       <h2 id="tRes" style="margin:0 0 2px">Como termina</h2>
-      <p class="h2sub" style="margin:0">Com as suas escolhas, em <span id="mN"></span> cenários. Ao lado de cada número, a diferença para o painel (em pontos percentuais, quando passa de 1).</p>
+      <p class="h2sub" style="margin:0">A tabela vai somando os resultados que você escolhe. À direita, como termina em <span id="mN"></span> cenários, com a diferença para o painel embaixo (em pontos percentuais, quando passa de 1).</p>
       <div class="g-cards" id="gCards"></div>
       <div class="tabela-wrap"><table class="ranking" id="tabSim"></table></div>
-      <p class="nota" style="margin-top:6px"><b>#</b>: posição média nos cenários · <b>Pts</b>: pontos no fim (média; embaixo, o mínimo e o máximo) · <b>Lib.</b>: chance de Libertadores (grupos + pré) · <b>Cai</b>: chance de terminar entre o 17º e o 20º. Faixa lilás: os quatro últimos.</p>
+      <p class="nota" style="margin-top:6px"><b>P</b>, <b>J</b>, <b>V</b>, <b>E</b>, <b>D</b>, <b>GP</b>, <b>GC</b>, <b>SG</b>: a tabela de hoje mais os jogos que você escolheu (em roxo, o que mudou); jogo escolhido sem placar conta nos pontos, mas não nos gols. Desempate: pontos, vitórias, saldo, gols pró. <b>Fim</b>: pontos no fim do campeonato (média dos cenários; embaixo, o mínimo e o máximo) · <b>Lib.</b>: chance de Libertadores (grupos + pré) · <b>Cai</b>: chance de terminar entre o 17º e o 20º. Faixa lilás: os quatro últimos da tabela. No celular, E, D, GP e GC ficam ocultos.</p>
       <p class="calc" id="calc"></p>
     </section>
   </div>
@@ -403,9 +419,34 @@ function desenhaFinais() {
 
 /* jogos */
 const ORD = Object.fromEntries(DADOS.tabela.map(r => [r.clube, r.pos]));
-const selF = document.getElementById("selF");
-selF.replaceChildren(el("option", {value: ""}, "Todos"), ...[...DADOS.tabela].sort((a, b) => a.pos - b.pos).map(r => el("option", {value: r.clube}, r.clube)));
-selF.onchange = desenhaJogos;
+/* seletor de clube com escudo (o select nativo não mostra imagem) */
+let filtroClube = "";
+(function () {
+  const OPC = ["", ...[...DADOS.tabela].sort((a, b) => a.pos - b.pos).map(r => r.clube)];
+  const box = document.getElementById("selF");
+  const btn = el("button", {type: "button", "aria-haspopup": "listbox", "aria-expanded": "false", "aria-labelledby": "rotF selFBtn", id: "selFBtn"});
+  const lista = el("ul", {role: "listbox", tabindex: "-1", "aria-labelledby": "rotF"}); lista.hidden = true;
+  const rot = c => c ? [escudo(c), c] : [el("span", {class: "todos"}), "Todos"];
+  let foco = 0;
+  const marca = i => { foco = (i + OPC.length) % OPC.length; [...lista.children].forEach((li, k) => li.classList.toggle("foco", k === foco));
+    lista.children[foco].scrollIntoView({block: "nearest"}); lista.setAttribute("aria-activedescendant", lista.children[foco].id); };
+  const abre = () => { lista.hidden = false; btn.setAttribute("aria-expanded", "true"); marca(OPC.indexOf(filtroClube)); lista.focus(); };
+  const fecha = volta => { lista.hidden = true; btn.setAttribute("aria-expanded", "false"); if (volta) btn.focus(); };
+  const escolhe = c => { filtroClube = c; btn.replaceChildren(...rot(c)); [...lista.children].forEach((li, k) => li.setAttribute("aria-selected", String(OPC[k] === c))); fecha(true); desenhaJogos(); };
+  lista.replaceChildren(...OPC.map((c, k) => { const li = el("li", {role: "option", id: "opF" + k, "aria-selected": String(c === "")}, ...rot(c));
+    li.onclick = () => escolhe(c); li.onmousemove = () => marca(k); return li; }));
+  btn.replaceChildren(...rot(""));
+  btn.onclick = () => lista.hidden ? abre() : fecha();
+  btn.onkeydown = ev => { if (["ArrowDown", "ArrowUp", "Enter", " "].includes(ev.key)) { ev.preventDefault(); abre(); } };
+  lista.onkeydown = ev => {
+    if (ev.key === "ArrowDown") { ev.preventDefault(); marca(foco + 1); }
+    else if (ev.key === "ArrowUp") { ev.preventDefault(); marca(foco - 1); }
+    else if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); escolhe(OPC[foco]); }
+    else if (ev.key === "Escape" || ev.key === "Tab") fecha(ev.key === "Escape");
+  };
+  document.addEventListener("click", ev => { if (!box.contains(ev.target)) fecha(); });
+  box.replaceChildren(btn, lista);
+})();
 function linhaJogo(j) {
   const k = chaveJ(j), e = ESC[k];
   const res = Array.isArray(e) ? (e[0] > e[1] ? "m" : e[0] === e[1] ? "e" : "v") : e || "";
@@ -438,13 +479,26 @@ function linhaJogo(j) {
   return linha;
 }
 function desenhaJogos() {
-  const f = selF.value, box = document.getElementById("jogos"); box.replaceChildren();
+  const f = filtroClube, box = document.getElementById("jogos"); box.replaceChildren();
   const js = DADOS.jogos.filter(j => !f || j.mandante === f || j.visitante === f);
   let rod = null;
   for (const j of [...js].sort((a, b) => a.rodada - b.rodada || ORD[a.mandante] - ORD[b.mandante])) {
     if (j.rodada !== rod) { rod = j.rodada; box.append(el("div", {class: "rod-t"}, (rod === 21 ? "Jogo atrasado (21ª)" : rod + "ª rodada"))); }
     box.append(linhaJogo(j));
   }
+}
+
+/* tabela de hoje mais os jogos escolhidos (desempate oficial: pontos, vitórias, saldo, gols pró) */
+function tabelaCarregada() {
+  const T = Object.fromEntries(DADOS.tabela.map(r => [r.clube, {...r}]));
+  for (const j of DADOS.jogos) {
+    const e = ESC[chaveJ(j)]; if (!e) continue;
+    const m = T[j.mandante], v = T[j.visitante]; m.J++; v.J++;
+    const r = Array.isArray(e) ? (e[0] > e[1] ? "m" : e[0] === e[1] ? "e" : "v") : e;
+    if (r === "m") { m.P += 3; m.V++; v.D++; } else if (r === "v") { v.P += 3; v.V++; m.D++; } else { m.P++; v.P++; m.E++; v.E++; }
+    if (Array.isArray(e)) { m.GP += e[0]; m.GC += e[1]; v.GP += e[1]; v.GC += e[0]; m.SG += e[0] - e[1]; v.SG += e[1] - e[0]; }
+  }
+  return Object.values(T).sort((a, b) => b.P - a.P || b.V - a.V || b.SG - a.SG || b.GP - a.GP || a.clube.localeCompare(b.clube));
 }
 
 /* resultado */
@@ -455,18 +509,25 @@ function desenhaResultado(R) {
   const T = R.tamanho, mx = Math.max(...Object.values(T));
   document.getElementById("gCards").replaceChildren(...[6, 7, 8, 9].map(g => el("div", {class: "g-card" + (T[g] === mx ? " top" : "")},
     el("span", {class: "r"}, g === 6 ? "Só G6" : "G" + g), el("b", {}, pc(T[g])), delta(T[g], DADOS.ref_tamanho[g] || 0))));
-  const rows = [...R.clubes].sort((a, b) => a.pos - b.pos);
+  const FIM = Object.fromEntries(R.clubes.map(r => [r.clube, r]));
+  const HOJE = Object.fromEntries(DADOS.tabela.map(r => [r.clube, r]));
+  const rows = tabelaCarregada();
   const tab = document.getElementById("tabSim");
-  const cab = el("thead", {}, el("tr", {}, el("th", {class: "n"}, "#"), el("th", {}, "Clube"), el("th", {class: "n"}, "Pts"), el("th", {class: "n"}, "Lib."), el("th", {class: "n"}, "Cai")));
+  const th = (t, cls, title) => el("th", {class: cls || "", title: title || ""}, t);
+  const cab = el("thead", {}, el("tr", {}, th("#", "n"), th("Clube"), th("P", "n"), th("J", "n"), th("V", "n"), th("E", "n md"), th("D", "n md"),
+    th("GP", "n gpgc md"), th("GC", "n gpgc md"), th("SG", "n"), th("Fim", "n fim", "pontos no fim (média dos cenários)"), th("Lib.", "n"), th("Cai", "n")));
   const corpo = el("tbody");
+  const td = (v, k, r, cls) => el("td", {class: "n " + (cls || "")}, el("span", {class: r[k] !== HOJE[r.clube][k] ? "mudou" : ""}, k === "SG" && v > 0 ? "+" + v : v));
   rows.forEach((r, i) => {
-    const pts = r.ptsMin === r.ptsMax ? String(r.ptsMin) : num1(r.pts);
+    const f = FIM[r.clube], pts = f.ptsMin === f.ptsMax ? String(f.ptsMin) : num1(f.pts);
     const tr = el("tr", {class: (i >= 16 ? "z4" : "") + (i === 15 ? " corte" : "")},
-      el("td", {class: "n"}, num1(r.pos)),
-      el("td", {}, el("span", {class: "cl"}, escudo(r.clube), r.clube)),
-      el("td", {class: "n"}, pts, r.ptsMin !== r.ptsMax ? el("span", {class: "pts-f"}, r.ptsMin + "–" + r.ptsMax) : null),
-      el("td", {class: "n"}, el("span", {class: r.lib >= 50 ? "forte" : ""}, pc(r.lib)), delta(r.lib, REF[r.clube].lib)),
-      el("td", {class: "n"}, el("span", {class: r.cai >= 50 ? "forte" : ""}, pc(r.cai)), delta(r.cai, REF[r.clube].cai, true)));
+      el("td", {class: "n"}, i + 1),
+      el("td", {}, el("span", {class: "cl", title: r.clube}, escudo(r.clube), el("span", {class: "nm"}, r.clube))),
+      td(r.P, "P", r, ""), td(r.J, "J", r), td(r.V, "V", r), td(r.E, "E", r, "md"), td(r.D, "D", r, "md"),
+      td(r.GP, "GP", r, "gpgc md"), td(r.GC, "GC", r, "gpgc md"), td(r.SG, "SG", r),
+      el("td", {class: "n fim"}, el("b", {}, pts), f.ptsMin !== f.ptsMax ? el("span", {class: "pts-f"}, f.ptsMin + "–" + f.ptsMax) : null),
+      el("td", {class: "n"}, el("span", {class: f.lib >= 50 ? "forte" : ""}, pc(f.lib)), delta(f.lib, REF[r.clube].lib)),
+      el("td", {class: "n"}, el("span", {class: f.cai >= 50 ? "forte" : ""}, pc(f.cai)), delta(f.cai, REF[r.clube].cai, true)));
     corpo.append(tr);
   });
   tab.replaceChildren(cab, corpo);

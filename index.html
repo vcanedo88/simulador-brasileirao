@@ -660,11 +660,13 @@ function desenhaJogos() {
     [`Grêmio ${casa ? "em casa" : "fora"} no returno`, "entra junto com a primeira linha", Math.round(casa ? G.casa : G.fora) + "%"],
   ];
   const box = document.getElementById("exemplo");
-  box.append(el("div", {class: "ex-topo"}, escudo("Grêmio"), "Grêmio x " + j.adversario, escudo(j.adversario), el("span", {}, `${j.rodada}ª rodada, ${casa ? "em casa" : "fora"}`)));
+  // título na ordem oficial (mandante x visitante); a conta continua sendo a dificuldade do Grêmio
+  const [mand, vis] = casa ? ["Grêmio", j.adversario] : [j.adversario, "Grêmio"];
+  box.append(el("div", {class: "ex-topo"}, escudo(mand), mand + " x " + vis, escudo(vis), el("span", {}, `${j.rodada}ª rodada · dificuldade para o Grêmio, que joga ${casa ? "em casa" : "fora"}`)));
   for (const [a, b, v] of linhas) box.append(el("div", {class: "ex-linha"}, el("div", {}, a, el("small", {}, b)), el("div", {}), el("b", {}, v)));
   box.append(el("div", {class: "ex-linha media"}, el("div", {}, "Dificuldade", el("small", {}, `um time mediano deixaria ${Math.round(j.dificuldade)}% dos pontos`)), el("div", {}, el("span", {class: "dif " + fx}, NOMEF[fx])), el("b", {}, Math.round(j.dificuldade))));
   const tot = jg.reduce((s, x) => s + x.pontos_esperados, 0);
-  box.append(el("p", {class: "ex-pe"}, `Para o Grêmio: vence ${pc(j.vitoria)}, empata ${pc(j.empate)}, ${num1(j.pontos_esperados)} ponto esperado. Somando os 4 jogos: ${G.pontos} + ${num1(tot)} = `, el("b", {}, num1(G.pontos + tot) + " pontos"), "."));
+  box.append(el("p", {class: "ex-pe"}, `Para o Grêmio: vence ${pc(j.vitoria)}, empata ${pc(j.empate)}, ${num1(j.pontos_esperados)} ponto esperado. Somando os ${jg.length} jogos: ${G.pontos} + ${num1(tot)} = `, el("b", {}, num1(G.pontos + tot) + " pontos"), "."));
 })();
 
 function tudo() { desenhaFinal(); desenhaCurva(); }
