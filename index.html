@@ -524,7 +524,7 @@ document.getElementById("chance").replaceChildren(...porChance.map(r => el("div"
 /* como termina */
 function desenhaFinal() {
   const box = document.getElementById("final"); box.replaceChildren();
-  const rows = [...CLUBES].sort((a, b) => b.chance_cair - a.chance_cair);   // mesma ordem do resto do painel
+  const rows = [...CLUBES].sort((a, b) => a.posicao - b.posicao);   // ordem da tabela, de cima para baixo (como no painel da Libertadores)
   const mxp = r => r.pontos + 3 * r.jogos_restantes;
   const lo = 2 * Math.floor(Math.min(...rows.map(r => r.pontos)) / 2), hi = 2 * Math.ceil(Math.max(...rows.map(mxp)) / 2);
   const W = box.clientWidth || 560, rh = 34, top = 26, H = top + rows.length * rh + 6, lw = 128;
@@ -574,17 +574,17 @@ function desenhaCurva() {
 }
 
 /* quanto falta */
-tabela("tab44", [...CLUBES], [
+tabela("tab44", [...CLUBES].sort((a, b) => a.posicao - b.posicao), [
   {rot: "", val: r => r.clube, cel: r => clube(r.clube)},
   {rot: "Pts", val: r => r.pontos, n: true},
   {rot: "Jogos", val: r => r.jogos_restantes, n: true},
   {rot: "Faltam", val: r => r.pontos_ate_44, cel: r => r.pontos_ate_44 ? "+" + r.pontos_ate_44 : certo("já tem 44 pontos"), n: true, cls: r => r.pontos_ate_44 ? "roxo" : ""},
   {rot: "Chance", val: r => r.chance_de_chegar, cel: r => r.chance_de_chegar == null ? "–" : pc(r.chance_de_chegar), n: true},
-], {i: 1, dir: 1});
+], {i: -1, dir: 1});
 
 /* índice */
-// na ordem da tabela, de baixo para cima (o lanterna da briga primeiro)
-const comInd = DADOS.clubes.filter(r => r.dificuldade != null && r.no_indice !== false).sort((a, b) => b.posicao - a.posicao);
+// na ordem da tabela, de cima para baixo (como no painel da Libertadores)
+const comInd = DADOS.clubes.filter(r => r.dificuldade != null && r.no_indice !== false).sort((a, b) => a.posicao - b.posicao);
 { const fora = DADOS.clubes.filter(r => r.no_indice === false).sort((a, b) => a.posicao - b.posicao).map(r => r.clube);
   if (fora.length) document.getElementById("mForaInd").textContent = " " + fora.join(fora.length > 2 ? ", " : " e ").replace(/, ([^,]*)$/, " e $1") + (fora.length > 1 ? " já chegaram aos 44 pontos e saíram da briga neste painel (seguem na tabela de quem ainda pode cair); os jogos deles aparecem em \"O modelo acertou?\", no fim da página." : " já chegou aos 44 pontos e saiu da briga neste painel (segue na tabela de quem ainda pode cair); os jogos dele aparecem em \"O modelo acertou?\", no fim da página."); }
 const NO_IND = new Set(comInd.map(r => r.clube)), POS = Object.fromEntries(DADOS.clubes.map(r => [r.clube, r.posicao]));
@@ -629,7 +629,7 @@ selLista.onkeydown = ev => {
 document.addEventListener("click", ev => { if (!selBox.contains(ev.target)) fecha(); });
 selBox.replaceChildren(selBtn, selLista);
 function desenhaJogos() {
-  const rows = DADOS.jogos.filter(j => NO_IND.has(j.clube) && (!clubeSel || j.clube === clubeSel)).sort((a, b) => POS[b.clube] - POS[a.clube] || a.rodada - b.rodada);
+  const rows = DADOS.jogos.filter(j => NO_IND.has(j.clube) && (!clubeSel || j.clube === clubeSel)).sort((a, b) => POS[a.clube] - POS[b.clube] || a.rodada - b.rodada);
   tabela("tabJogos", rows, [
     {rot: "", val: r => r.clube, cel: r => clube(r.clube)},
     {rot: "Rod.", val: r => r.rodada, cel: r => r.rodada + "ª", n: true},

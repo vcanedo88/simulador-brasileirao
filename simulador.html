@@ -179,6 +179,9 @@ table.ranking{min-width:0;width:100%}
 .rod-t{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--texto-2);margin:18px 0 2px;padding-bottom:4px;border-bottom:2px solid var(--texto)}
 .jg{padding:9px 0 10px;border-bottom:1px solid var(--linha)}
 .jg.escolhido{background:linear-gradient(90deg,var(--s1),transparent 70%)}
+.jg.sorteado{background:linear-gradient(90deg,#EFEFEF,transparent 70%)}
+.jg.sorteado .gol{color:var(--roxo)}
+.jg.sorteado .seg .peso{display:none}
 .jg-l1{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;margin-bottom:7px}
 .tm{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;min-width:0}
 .tm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -201,7 +204,8 @@ table.ranking{min-width:0;width:100%}
 #tabSim{width:100%}
 #tabSim td,#tabSim th{padding:5px 3px}
 #tabSim th{white-space:nowrap}
-#tabSim .fim{border-left:2px solid var(--texto)}
+#tabSim .fim{border-left:2px solid var(--texto);padding-left:8px}
+#tabSim .sg{padding-right:12px}
 #tabSim th.fim{border-left:2px solid var(--texto)}
 #tabSim .mudou{font-weight:700;color:var(--roxo)}
 #tabSim .dlt{display:block;margin:0;line-height:1.1}
@@ -241,9 +245,10 @@ html.modo-video .abas{display:none}
   </header>
 
   <div class="barra-ctl">
-    <span class="cont"><b id="nEsc">0</b> de <span id="nTot"></span> jogos escolhidos</span>
-    <button class="btn" id="btnZera" type="button">Limpar escolhas</button>
-    <button class="btn pri" id="btnLink" type="button">Copiar link desta simulação</button>
+    <button class="btn pri" id="btnSort" type="button" title="sorteia um placar para cada jogo que está no Modelo, rodada a rodada, e o campeão de cada final">Sortear os jogos</button>
+    <span class="cont"><b id="nEsc">0</b> de <span id="nTot"></span> jogos com resultado</span>
+    <button class="btn" id="btnZera" type="button">Limpar</button>
+    <button class="btn" id="btnLink" type="button">Copiar link desta simulação</button>
     <span class="copiado" id="copiado" hidden>Link copiado</span>
     <input class="link-box" id="linkBox" readonly aria-label="Link desta simulação">
   </div>
@@ -252,11 +257,11 @@ html.modo-video .abas{display:none}
     <section class="sim-jogos" aria-labelledby="tJogos">
       <div class="finais">
         <h2 style="margin:0 0 2px">As finais</h2>
-        <p class="h2sub" style="margin:0 0 4px">Mudam o tamanho do G. Em <b>Sortear</b>, cada cenário sorteia o campeão com as chances do mercado (as porcentagens). Clique num clube para fixá-lo campeão.</p>
+        <p class="h2sub" style="margin:0 0 4px">Mudam o tamanho do G. Em <b>Modelo</b>, o campeão é sorteado em cada cenário com as chances do mercado (as porcentagens). Clique num clube para fixá-lo campeão.</p>
         <div id="finais"></div>
       </div>
       <h2 id="tJogos" style="margin:0 0 2px">Os jogos que faltam</h2>
-      <p class="h2sub" style="margin:0 0 10px">Todo jogo começa em <b>Sortear</b>: em cada um dos <span class="mN3"></span> cenários, o resultado é sorteado com as chances do modelo, que são as porcentagens dos botões (a barrinha lilás mostra o peso de cada uma). Clique num resultado ou digite o placar para fixá-lo; o placar entra no saldo de gols. Para devolver o jogo ao sorteio, clique em Sortear.</p>
+      <p class="h2sub" style="margin:0 0 10px">Todo jogo começa em <b>Modelo</b>: ele fica em aberto e, a cada mudança, o simulador joga a reta final <span class="mN3"></span> vezes com as chances do modelo (as porcentagens dos botões; a barrinha lilás mostra o peso de cada uma). É isso que dá as chances de <b>Como termina</b>. Para fixar um jogo, clique no resultado ou digite o placar (o placar entra no saldo). Para ver uma temporada possível inteira, use <b>Sortear os jogos</b>: ele sorteia um placar para cada jogo em aberto, rodada a rodada, e a tabela vai andando. Clique de novo para outra temporada.</p>
       <div class="filtro"><span id="rotF">Mostrar jogos de</span><div class="sel-esc" id="selF"></div></div>
       <div id="jogos"></div>
     </section>
@@ -273,7 +278,7 @@ html.modo-video .abas{display:none}
 
   <section class="bloco" id="como">
     <h2>Como funciona</h2>
-    <p class="h2sub" style="max-width:860px">É a mesma conta dos painéis do rebaixamento e da Libertadores, feita no seu navegador. A cada mudança, os jogos que ficaram em Sortear são sorteados <span id="mN2"></span> vezes com as chances do índice do canal; os que você escolheu ficam fixos. Sem placar, o saldo de gols de quem vence é sorteado (1 gol em 60% das vezes, 2 em 28%, 3 em 12%). Desempate: pontos, vitórias, saldo e sorteio (gols pró não entram). Finais: <span id="mFin"></span>. Vagas: G4 na fase de grupos e o 5º na pré; campeões da Libertadores, da Sul-Americana e da Copa do Brasil vão aos grupos e o vice da Copa vai à pré; vaga de quem já está classificado ou caiu passa para a tabela. Rebaixados: do 17º ao 20º. Sem nenhuma escolha, os números ficam a até 1 ponto dos do painel: é a variação natural do sorteio.</p>
+    <p class="h2sub" style="max-width:860px">É a mesma conta dos painéis do rebaixamento e da Libertadores, feita no seu navegador. A cada mudança, os jogos que ficaram em Modelo são sorteados <span id="mN2"></span> vezes com as chances do índice do canal; os que você escolheu ficam fixos. Sem placar, o saldo de gols de quem vence é sorteado (1 gol em 60% das vezes, 2 em 28%, 3 em 12%). Desempate: pontos, vitórias, saldo e sorteio (gols pró não entram). Finais: <span id="mFin"></span>. Vagas: G4 na fase de grupos e o 5º na pré; campeões da Libertadores, da Sul-Americana e da Copa do Brasil vão aos grupos e o vice da Copa vai à pré; vaga de quem já está classificado ou caiu passa para a tabela. Rebaixados: do 17º ao 20º. Sem nenhuma escolha, os números ficam a até 1 ponto dos do painel: é a variação natural do sorteio.</p>
   </section>
 
   <footer class="rodape">
@@ -415,12 +420,12 @@ function desenhaFinais() {
     const seg = el("div", {class: "seg", role: "group", "aria-label": "Final da " + L[k][0]});
     const nomeR = {"Boca Juniors": "Boca", "Estudiantes": "Estudiantes"}[F.rival] || F.rival;
     const pa = Math.round(100 * F.prob);   // os dois lados somam 100
-    const ops = [[null, ["Sortear"], "mod", null], [true, [escudo(F.campeao), curto(F.campeao) + " ", el("span", {class: "p"}, pa + "%")], "", F.prob],
+    const ops = [[null, ["Modelo"], "mod", null], [true, [escudo(F.campeao), curto(F.campeao) + " ", el("span", {class: "p"}, pa + "%")], "", F.prob],
                  [false, [escudo(F.rival), nomeR + " ", el("span", {class: "p"}, (100 - pa) + "%")], "", 1 - F.prob]];
     for (const [v, kids, cls, peso] of ops) {
-      const b = el("button", {type: "button", class: cls, "aria-pressed": String(FIN[k] === v), title: v == null ? "sorteia o campeão com as chances do mercado" : (v ? F.campeao : F.rival) + " campeão"}, ...kids,
+      const b = el("button", {type: "button", class: cls, "aria-pressed": String(FIN[k] === v), title: v == null ? "em aberto: em cada cenário, o campeão sai pelas chances do mercado" : (v ? F.campeao : F.rival) + " campeão"}, ...kids,
         peso != null ? el("span", {class: "peso", style: `width:${(100 * peso).toFixed(1)}%`}) : null);
-      b.onclick = () => { FIN[k] = v; desenhaFinais(); muda(); };
+      b.onclick = () => { FIN[k] = v; FSORT.delete(k); desenhaFinais(); muda(); };
       seg.append(b);
     }
     box.append(el("div", {class: "fin" + (FIN[k] != null ? " fixa" : "")}, tit, seg));
@@ -465,18 +470,18 @@ function linhaJogo(j) {
   if (Array.isArray(e)) { gm.value = e[0]; gv.value = e[1]; }
   const lePlacar = () => {
     const a = gm.value === "" ? null : Math.max(0, Math.min(20, parseInt(gm.value, 10))), b = gv.value === "" ? null : Math.max(0, Math.min(20, parseInt(gv.value, 10)));
-    if (a == null && b == null) { if (Array.isArray(ESC[k])) { delete ESC[k]; atualizaLinha(); muda(); } return; }
+    if (a == null && b == null) { if (Array.isArray(ESC[k])) { delete ESC[k]; SORT.delete(k); atualizaLinha(); muda(); } return; }
     if (a == null || b == null || isNaN(a) || isNaN(b)) return;
-    ESC[k] = [a, b]; atualizaLinha(); muda();
+    ESC[k] = [a, b]; SORT.delete(k); atualizaLinha(); muda();
   };
   gm.oninput = gv.oninput = lePlacar;
   const seg = el("div", {class: "seg", role: "group", "aria-label": j.mandante + " x " + j.visitante});
   const tot = j.pm + j.pe + j.pv;
-  const ops = [["", ["Sortear"], "mod", null], ["m", [escudo(j.mandante), el("span", {class: "p"}, pc(j.pm))], "", j.pm], ["e", ["Empate ", el("span", {class: "p"}, pc(j.pe))], "", j.pe], ["v", [escudo(j.visitante), el("span", {class: "p"}, pc(j.pv))], "", j.pv]];
+  const ops = [["", ["Modelo"], "mod", null], ["m", [escudo(j.mandante), el("span", {class: "p"}, pc(j.pm))], "", j.pm], ["e", ["Empate ", el("span", {class: "p"}, pc(j.pe))], "", j.pe], ["v", [escudo(j.visitante), el("span", {class: "p"}, pc(j.pv))], "", j.pv]];
   const botoes = ops.map(([v, kids, cls, peso]) => {
-    const b = el("button", {type: "button", class: cls, "aria-pressed": "false", title: v === "" ? "sorteia o resultado com as chances do modelo" : v === "m" ? "fixar vitória do " + j.mandante : v === "v" ? "fixar vitória do " + j.visitante : "fixar empate"}, ...kids,
+    const b = el("button", {type: "button", class: cls, "aria-pressed": "false", title: v === "" ? "em aberto: em cada cenário, o resultado sai pelas chances do modelo" : v === "m" ? "fixar vitória do " + j.mandante : v === "v" ? "fixar vitória do " + j.visitante : "fixar empate"}, ...kids,
       peso != null ? el("span", {class: "peso", style: `width:${(100 * peso / tot).toFixed(1)}%`}) : null);
-    b.onclick = () => { if (v) ESC[k] = v; else delete ESC[k]; gm.value = gv.value = ""; atualizaLinha(); muda(); };
+    b.onclick = () => { if (v) ESC[k] = v; else delete ESC[k]; SORT.delete(k); gm.value = gv.value = ""; atualizaLinha(); muda(); };
     seg.append(b); return [v, b];
   });
   const linha = el("div", {class: "jg"},
@@ -485,7 +490,8 @@ function linhaJogo(j) {
   function atualizaLinha() {
     const e2 = ESC[k], r2 = Array.isArray(e2) ? (e2[0] > e2[1] ? "m" : e2[0] === e2[1] ? "e" : "v") : e2 || "";
     for (const [v, b] of botoes) b.setAttribute("aria-pressed", String(v === r2));
-    linha.classList.toggle("escolhido", !!e2);
+    linha.classList.toggle("escolhido", !!e2 && !SORT.has(k));
+    linha.classList.toggle("sorteado", SORT.has(k));
   }
   atualizaLinha();
   return linha;
@@ -513,6 +519,13 @@ function tabelaCarregada() {
   return Object.values(T).sort((a, b) => b.P - a.P || b.V - a.V || b.SG - a.SG || b.GP - a.GP || a.clube.localeCompare(b.clube));
 }
 
+/* rebaixado com certeza: pelo menos 16 clubes já têm mais pontos do que ele ainda pode fazer (jogos em aberto valem 3) */
+function caiuCerto(r, rows) {
+  const aberto = DADOS.jogos.filter(j => !ESC[chaveJ(j)] && (j.mandante === r.clube || j.visitante === r.clube)).length;
+  const max = r.P + 3 * aberto;
+  return rows.filter(o => o.clube !== r.clube && o.P > max).length >= 16;
+}
+
 /* resultado */
 const REF = DADOS.ref;
 const delta = (v, ref, inverte) => { const d = v - ref; if (Math.abs(d) < 1) return null;
@@ -527,7 +540,7 @@ function desenhaResultado(R) {
   const tab = document.getElementById("tabSim");
   const th = (t, cls, title) => el("th", {class: cls || "", title: title || ""}, t);
   const cab = el("thead", {}, el("tr", {}, th("#", "n"), th("Clube"), th("P", "n"), th("J", "n"), th("V", "n"), th("E", "n md"), th("D", "n md"),
-    th("GP", "n gpgc md"), th("GC", "n gpgc md"), th("SG", "n"), th("Fim", "n fim", "pontos no fim (média dos cenários)"), th("Lib.", "n"), th("Cai", "n")));
+    th("GP", "n gpgc md"), th("GC", "n gpgc md"), th("SG", "n sg"), th("Fim", "n fim", "pontos no fim (média dos cenários)"), th("Lib.", "n"), th("Cai", "n")));
   const corpo = el("tbody");
   const td = (v, k, r, cls) => el("td", {class: "n " + (cls || "")}, el("span", {class: r[k] !== HOJE[r.clube][k] ? "mudou" : ""}, k === "SG" && v > 0 ? "+" + v : v));
   rows.forEach((r, i) => {
@@ -536,32 +549,59 @@ function desenhaResultado(R) {
       el("td", {class: "n"}, i + 1),
       el("td", {}, el("span", {class: "cl", title: r.clube}, escudo(r.clube), el("span", {class: "nm"}, r.clube))),
       td(r.P, "P", r, ""), td(r.J, "J", r), td(r.V, "V", r), td(r.E, "E", r, "md"), td(r.D, "D", r, "md"),
-      td(r.GP, "GP", r, "gpgc md"), td(r.GC, "GC", r, "gpgc md"), td(r.SG, "SG", r),
+      td(r.GP, "GP", r, "gpgc md"), td(r.GC, "GC", r, "gpgc md"), td(r.SG, "SG", r, "sg"),
       el("td", {class: "n fim"}, el("b", {}, pts), f.ptsMin !== f.ptsMax ? el("span", {class: "pts-f"}, f.ptsMin + "–" + f.ptsMax) : null),
       el("td", {class: "n"}, el("span", {class: f.lib >= 50 ? "forte" : ""}, pc(f.lib)), delta(f.lib, REF[r.clube].lib)),
-      el("td", {class: "n"}, el("span", {class: f.cai >= 50 ? "forte" : ""}, pc(f.cai)), delta(f.cai, REF[r.clube].cai, true)));
+      el("td", {class: "n"}, el("span", {class: f.cai >= 50 ? "forte" : ""}, f.cai === 100 && !caiuCerto(r, rows) ? ">99%" : pc(f.cai)), delta(f.cai, REF[r.clube].cai, true)));
     corpo.append(tr);
   });
   tab.replaceChildren(cab, corpo);
 }
+/* "Sortear os jogos": uma temporada possível, com placar, rodada a rodada (os jogos já definidos pela pessoa ficam) */
+const SORT = new Set(), FSORT = new Set();
+const btnSort = document.getElementById("btnSort");
+let animando = false;
+const escolheIdx = ps => { let x = Math.random(), a = 0; for (let i = 0; i < ps.length; i++) { a += ps[i]; if (x < a) return i; } return ps.length - 1; };
+function placarSorteado(j) {
+  const t = j.pm + j.pe + j.pv, u = Math.random() * t;
+  if (u >= j.pm && u < j.pm + j.pe) { const g = escolheIdx([0.33, 0.45, 0.18, 0.04]); return [g, g]; }
+  const m = 1 + escolheIdx([0.6, 0.28, 0.12]), l = escolheIdx([0.55, 0.35, 0.10]);   // mesma margem da simulação
+  return u < j.pm ? [l + m, l] : [l, l + m];
+}
+btnSort.onclick = async () => {
+  if (animando) return; animando = true; btnSort.disabled = true;
+  for (const k of SORT) delete ESC[k]; SORT.clear();
+  for (const k of FSORT) FIN[k] = null; FSORT.clear();
+  for (const k of ["sula", "lib", "copa"]) if (FIN[k] == null) { FIN[k] = Math.random() < DADOS.finais[k].prob; FSORT.add(k); }
+  desenhaFinais();
+  const rods = [...new Set(DADOS.jogos.map(j => j.rodada))].sort((a, b) => a - b);
+  for (const r of rods) {
+    btnSort.textContent = `Sorteando a ${r}ª…`;
+    for (const j of DADOS.jogos.filter(j => j.rodada === r)) { const k = chaveJ(j); if (!ESC[k]) { ESC[k] = placarSorteado(j); SORT.add(k); } }
+    desenhaJogos(); muda();
+    await new Promise(ok => setTimeout(ok, 900));
+  }
+  animando = false; btnSort.disabled = false; btnSort.textContent = "Sortear de novo";
+};
 let pend = null;
 function calcula() {
   const t = performance.now();
   const R = simula(DADOS, ESC, FIN, NSIM, 2026);
   desenhaResultado(R);
-  const nf = Object.keys(ESC).length, nfin = Object.entries(FIN).filter(([k, v]) => v != null && DADOS.finais[k].prob > 0 && DADOS.finais[k].prob < 1).length;
-  const nsort = DADOS.jogos.length - nf, finSort = ["sula", "lib", "copa"].filter(k => FIN[k] == null).length;
-  document.getElementById("calc").textContent = `${nsort} jogo${nsort === 1 ? "" : "s"} e ${finSort} fina${finSort === 1 ? "l" : "is"} sorteados em cada cenário; ${nf} jogo${nf === 1 ? "" : "s"} e ${nfin} fina${nfin === 1 ? "l" : "is"} fixados por você. Calculado em ${Math.round(performance.now() - t)} ms.`;
+  const nf = Object.keys(ESC).length, nab = DADOS.jogos.length - nf, fab = ["sula", "lib", "copa"].filter(k => FIN[k] == null).length;
+  const pl = (n, a, b) => n + " " + (n === 1 ? a : b);
+  document.getElementById("calc").textContent = (nab || fab ? `Em aberto (no Modelo): ${pl(nab, "jogo", "jogos")} e ${pl(fab, "final", "finais")}, jogados ${NSIM / 1000} mil vezes. ` : "Tudo definido: a tabela acima é a final (só o desempate por sorteio varia). ")
+    + `Com resultado: ${pl(nf, "jogo", "jogos")}${SORT.size ? ` (${SORT.size} sorteados)` : ""}. Calculado em ${Math.round(performance.now() - t)} ms.`;
 }
 function muda() {
   document.getElementById("nEsc").textContent = Object.keys(ESC).length;
   const temEscolha = Object.keys(ESC).length > 0 || ["sula", "lib", "copa"].some(k => FIN[k] != null && DADOS.finais[k].prob > 0 && DADOS.finais[k].prob < 1);
-  const bz = document.getElementById("btnZera"); bz.disabled = !temEscolha; bz.title = temEscolha ? "volta todos os jogos e finais ao sorteio" : "nada escolhido: tudo já está no sorteio";
+  const bz = document.getElementById("btnZera"); bz.disabled = !temEscolha; bz.title = temEscolha ? "volta todos os jogos e finais ao Modelo" : "nada definido: tudo já está no Modelo";
   gravaHash();
   document.getElementById("calc").textContent = "Calculando…";
   clearTimeout(pend); pend = setTimeout(calcula, 60);
 }
-document.getElementById("btnZera").onclick = () => { for (const k in ESC) delete ESC[k];
+document.getElementById("btnZera").onclick = () => { if (animando) return; for (const k in ESC) delete ESC[k]; SORT.clear(); FSORT.clear(); btnSort.textContent = "Sortear os jogos";
   for (const k of ["sula", "lib", "copa"]) { const p = DADOS.finais[k].prob; FIN[k] = p >= 1 ? true : p <= 0 ? false : null; }
   desenhaFinais(); desenhaJogos(); muda(); };
 document.getElementById("btnLink").onclick = async () => {
