@@ -298,7 +298,7 @@ html.modo-video .video-nav:hover{opacity:1}
 #tabLib td.p{font-weight:700}
 .prem-c .lin b.g{color:var(--texto)}
 .prem-c .lin span b{font-weight:700;color:var(--roxo)}
-.auto-res{display:flex;flex-wrap:wrap;gap:6px 24px;margin:4px 0 10px;font-size:14px}
+.auto-res{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 24px;margin:4px 0 10px;font-size:14px}
 .auto-res b{color:var(--roxo);font-size:18px}
 .jogo-p{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .jogo-p img{width:22px;height:22px;object-fit:contain}
@@ -761,7 +761,8 @@ desenhaJogos();
   document.getElementById("autoResumo").replaceChildren(
     el("span", {}, el("b", {}, `${acertos} de ${PV.length}`), " jogos com o resultado mais provável"),
     el("span", {}, el("b", {}, pc(media)), " de chance média para o que de fato aconteceu"),
-    el("span", {}, "histórico do Brasileirão: " + pc(hist) + " · chute às cegas: 33%"));
+    el("span", {}, el("b", {}, pc(hist)), " pelo histórico do Brasileirão"),
+    el("span", {}, el("b", {}, "33%"), " no chute às cegas"));
   tabela("tabAuto", PV, [
     {rot: "Data", val: r => r.data.split("/").reverse().join(""), cel: r => r.data},
     {rot: "Jogo", val: r => r.mandante, cel: r => el("span", {class: "jogo-p", title: `${r.mandante} ${r.gm} x ${r.gv} ${r.visitante}`}, escudo(r.mandante), el("b", {}, `${r.gm} x ${r.gv}`), escudo(r.visitante))},
