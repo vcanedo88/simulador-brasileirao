@@ -259,10 +259,10 @@ html.modo-video .h2sub{font-size:14px}
 html.modo-video .video-nav{display:flex;position:fixed;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));gap:6px;align-items:center;font:600 12px var(--sans);color:var(--texto-2);opacity:.25;transition:opacity .2s;z-index:20}
 html.modo-video .video-nav:hover{opacity:1}
 .video-nav button{font:inherit;border:1px solid var(--cinza);background:var(--fundo);color:var(--texto);width:30px;height:30px;cursor:pointer}
-/* índice: a Dif. de cada jogo fica embaixo da Dif. do clube (as 3 primeiras colunas da lista de jogos copiam a largura das de cima) */
+/* índice: a Dif. de cada jogo fica embaixo da Dif. do clube (as 4 primeiras colunas da lista de jogos copiam a largura das de cima) */
 @media (max-width:400px){#tabAuto th,#tabIndice th{letter-spacing:0;font-size:9px}#tabAuto th,#tabAuto td{padding-left:1px;padding-right:1px}}@media (max-width:340px){#tabAuto,#tabIndice{font-size:11px}#tabIndice th,#tabIndice td{padding-left:1px;padding-right:1px}}
 #tabJogos.alinhada{table-layout:fixed}#tabJogos.alinhada th{box-sizing:border-box}
-#tabJogos.alinhada th:nth-child(1){width:var(--c1)}#tabJogos.alinhada th:nth-child(2){width:var(--c2)}#tabJogos.alinhada th:nth-child(3){width:var(--c3)}
+#tabJogos.alinhada th:nth-child(1){width:var(--c1)}#tabJogos.alinhada th:nth-child(2){width:var(--c2)}#tabJogos.alinhada th:nth-child(3){width:var(--c3)}#tabJogos.alinhada th:nth-child(4){width:var(--c4)}
 </style>
 <style>
 .abas{display:flex;gap:4px;margin:0 0 18px;border-bottom:1px solid var(--cinza,#E3E3E3)}
@@ -382,7 +382,7 @@ html.modo-video .abas{display:none}
     <p class="h2sub">Cada jogo da reta final, de 0 (fácil) a 100 (difícil). Fácil: até 38 · médio: até 54 · difícil: até 68 · muito difícil: acima (faixas de 07/11, um quarto dos 33 jogos que faltavam em cada). Jogo já disputado: linha apagada, com a força de antes do jogo e o resultado.</p>
     <div class="tabela-wrap"><table class="ranking" id="tabIndice"></table></div>
     <div class="tabela-wrap" style="margin-top:18px;max-height:460px;overflow:auto"><table class="ranking" id="tabJogos"></table></div>
-    <p class="nota"><b>Pts</b>: pontos hoje · <b>Dif.</b>: dificuldade, % dos pontos que um time mediano deixaria no jogo, com o mesmo mando · <b>Casa</b> e <b>Fora</b>: aproveitamento em casa e fora no returno · <b>Ano</b>: aproveitamento no Brasileirão · <b>xG 6j</b> e <b>Pts 6j</b>: saldo de xG sem pênaltis e pontos nos 6 últimos jogos (de 18) · <b>Proj.</b>: pontos no fim, em roxo abaixo de 44 · <b>Cai</b>: chance de cair. Na lista de jogos, <b>C</b>: em casa · <b>F</b>: fora · <b>Res.</b>: resultado do jogo já disputado (V, E ou D e o placar do clube) · <b>Adv.</b>: adversário; <b>Vence</b>, <b>Empata</b> e <b>Pts esp.</b> (pontos esperados) são do clube. No celular, as colunas do adversário ficam ocultas.</p>
+    <p class="nota"><b>Pts</b>: pontos hoje · <b>Jogos</b>: jogos que faltam · <b>Dif.</b>: dificuldade, % dos pontos que um time mediano deixaria no jogo, com o mesmo mando · <b>Casa</b> e <b>Fora</b>: aproveitamento em casa e fora no returno · <b>Ano</b>: aproveitamento no Brasileirão · <b>xG 6j</b> e <b>Pts 6j</b>: saldo de xG sem pênaltis e pontos nos 6 últimos jogos (de 18) · <b>Proj.</b>: pontos no fim, em roxo abaixo de 44 · <b>Cai</b>: chance de cair. Na lista de jogos, <b>C</b>: em casa · <b>F</b>: fora · <b>Res.</b>: resultado do jogo já disputado (V, E ou D e o placar do clube) · <b>Adv.</b>: adversário; <b>Vence</b>, <b>Empata</b> e <b>Pts esp.</b> (pontos esperados) são do clube. No celular, a coluna Ano e as colunas do adversário ficam ocultas.</p>
   </section>
 
 
@@ -587,10 +587,11 @@ const NO_IND = new Set(comInd.map(r => r.clube)), POS = Object.fromEntries(DADOS
 tabela("tabIndice", comInd, [
   {rot: "", val: r => r.clube, cel: r => clube(r.clube)},
   {rot: "Pts", val: r => r.pontos, n: true},
+  {rot: "Jogos", val: r => r.jogos_restantes, n: true},
   {rot: "Dif.", val: r => r.dificuldade, cel: r => el("span", {class: "dif " + faixa(r.dificuldade)}, Math.round(r.dificuldade)), n: true},
   {rot: "Casa", val: r => r.casa, cel: r => Math.round(r.casa) + "%", n: true},
   {rot: "Fora", val: r => r.fora, cel: r => Math.round(r.fora) + "%", n: true},
-  {rot: "Ano", val: r => r.aproveitamento, cel: r => Math.round(r.aproveitamento) + "%", n: true},
+  {rot: "Ano", val: r => r.aproveitamento, cel: r => Math.round(r.aproveitamento) + "%", n: true, so: "lg"},
   {rot: "xG 6j", val: r => r.xg_6, cel: r => sgn2(r.xg_6), n: true},
   {rot: "Pts 6j", val: r => r.pontos_6, n: true},
   {rot: "Proj.", val: r => r.projecao_indice, cel: r => num1(r.projecao_indice), n: true, cls: r => r.projecao_indice < 44 ? "roxo" : ""},
@@ -628,8 +629,8 @@ function desenhaJogos() {
   tabela("tabJogos", rows, [
     {rot: "", val: r => r.clube, cel: r => clube(r.clube)},
     {rot: "Rod.", val: r => r.rodada, cel: r => r.rodada + "ª", n: true},
-    {rot: "Dif.", val: r => r.dificuldade, cel: r => el("span", {class: "dif " + faixa(r.dificuldade)}, Math.round(r.dificuldade)), n: true},
     {rot: "Adv.", val: r => r.adversario, cel: r => { const i = escudo(r.adversario); i.alt = r.adversario; return el("span", {class: "adv so", title: r.adversario}, i); }},
+    {rot: "Dif.", val: r => r.dificuldade, cel: r => el("span", {class: "dif " + faixa(r.dificuldade)}, Math.round(r.dificuldade)), n: true},
     {rot: "Local", val: r => r.local, cel: r => r.local === "casa" ? "C" : "F"},
     {rot: "Adv. ano", val: r => r.adv_aprov, cel: r => Math.round(r.adv_aprov) + "%", n: true, so: "lg"},
     {rot: "Adv. casa/fora", val: r => r.adv_local, cel: r => Math.round(r.adv_local) + "%", n: true, so: "lg"},
@@ -668,11 +669,11 @@ function desenhaJogos() {
 function tudo() { desenhaFinal(); desenhaCurva(); }
 desenhaJogos(); tudo();
 
-/* alinha a Dif. dos jogos com a Dif. dos clubes: copia a largura das 3 primeiras colunas de cima */
+/* alinha a Dif. dos jogos com a Dif. dos clubes: copia a largura das 4 primeiras colunas de cima */
 (function () {
   const cima = document.getElementById("tabIndice"), baixo = document.getElementById("tabJogos");
-  const alinha = () => { const th = [...cima.querySelectorAll("thead th")].slice(0, 3).map(t => t.getBoundingClientRect().width);
-    if (th.length < 3 || !th[0]) return;
+  const alinha = () => { const th = [...cima.querySelectorAll("thead th")].slice(0, 4).map(t => t.getBoundingClientRect().width);
+    if (th.length < 4 || !th[0]) return;
     th.forEach((w, i) => baixo.style.setProperty("--c" + (i + 1), w + "px")); baixo.classList.add("alinhada"); };
   new ResizeObserver(alinha).observe(cima); alinha();
 })();
