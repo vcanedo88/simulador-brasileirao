@@ -407,8 +407,11 @@ document.querySelectorAll(".mFoto").forEach(e => e.textContent = META.foto);
 
 // quem já chegou aos 44 (lista fora_indice_z4 do estado) sai da briga no painel: chance, como termina, 44 pontos e índice; segue na tabela de quem ainda pode cair
 const CLUBES = DADOS.clubes.filter(r => r.no_indice !== false);
-// destaque (roxo): os quatro com mais chance de cair hoje, recalculado a cada atualização
-const FOCO = [...CLUBES].sort((a, b) => b.chance_cair - a.chance_cair).slice(0, 4).map(r => r.clube);
+// destaque (roxo): só as vagas de queda que ainda estão em jogo (4 menos quem já está praticamente rebaixado, ≥ 99,5%),
+// preenchidas pelos que têm mais chance de cair hoje; os cartões do topo seguem com os quatro mais ameaçados
+const VAGAS = Math.max(0, 4 - DADOS.tabela.filter(r => r.cai >= 99.5).length);
+const AMEACA4 = [...CLUBES].sort((a, b) => b.chance_cair - a.chance_cair).slice(0, 4).map(r => r.clube);
+const FOCO = AMEACA4.slice(0, VAGAS);
 const ESC_NOME = n => n;
 const NOME = n => n;
 const VERM = "#C62828";
@@ -468,9 +471,9 @@ function tabela(id, rows, cols, ordem, clsLinha) {
 document.getElementById("logoCamp").replaceChildren(el("img", {class: "logo-camp", src: LOGO_CAMP, alt: "Brasileirão"}));
 for (const id of ["assinatura", "assinatura2"]) { const s = document.getElementById(id); if (s) s.replaceChildren(el("img", {src: SIMBOLO, alt: "Canedo", style: "height:40px"})); }
 const C = Object.fromEntries(CLUBES.map(r => [r.clube, r]));
-document.getElementById("kpis").replaceChildren(...[...FOCO].sort((a, b) => C[b].chance_cair - C[a].chance_cair).map((c, i) => {
+document.getElementById("kpis").replaceChildren(...AMEACA4.map((c, i) => {
   const r = C[c];
-  return el("div", {class: "kpi" + (i === 0 ? " destaque" : "")}, el("div", {class: "kpi-esc"}, escudo(c), el("strong", {}, NOME(c))),
+  return el("div", {class: "kpi" + (FOCO.includes(c) ? " destaque" : "")}, el("div", {class: "kpi-esc"}, escudo(c), el("strong", {}, NOME(c))),
     el("b", {}, pc(r.chance_cair)), el("span", {}, `de chance de cair · ${r.posicao}º, ${r.pontos} pts · era ${pc(r.chance_antes)} em ${META.antes}`));
 }));
 
