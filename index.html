@@ -516,7 +516,7 @@ function evolucao(id, linhas, valor, rotLinha, tip) {
   evolucao("tabEvo", TBE.filter(r => !r.rebaixado), (e, c) => e.cai[c], r => clube(r.clube)); }
 
 /* chance */
-const porChance = [...CLUBES].sort((a, b) => b.chance_cair - a.chance_cair);
+const porChance = [...CLUBES].sort((a, b) => a.chance_cair - b.chance_cair || a.posicao - b.posicao);   // menos chance em cima, como a tabela
 document.getElementById("chance").replaceChildren(...porChance.map(r => el("div", {class: "barra l" + (FOCO.includes(r.clube) ? " top" : "")},
   escudo(r.clube, "esc"), el("span", {}, NOME(r.clube)), el("div", {class: "trilho"}, el("i", {style: `width:${Math.max(0.6, r.chance_cair)}%`})),
   el("b", {}, pc(r.chance_cair)), el("span", {class: "pts"}, `${r.pontos} pts · ${r.posicao}º`))));
