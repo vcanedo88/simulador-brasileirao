@@ -166,7 +166,7 @@ table.ranking{min-width:0;width:100%}
 .seg button[aria-pressed="true"].mod{background:var(--texto)}
 .seg button img{width:18px;height:18px;object-fit:contain}
 .seg button .p{font-variant-numeric:tabular-nums;font-weight:700}
-.filtro{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-size:13px;color:var(--texto-2)}
+.filtro{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 6px;font-size:13px;color:var(--texto-2)}
 .sel-esc{position:relative}
 .sel-esc button{display:inline-flex;align-items:center;gap:8px;min-width:190px;font:inherit;font-size:13px;color:var(--texto);background:#fff;border:1px solid var(--cinza);padding:5px 10px;cursor:pointer;text-align:left}
 .sel-esc button::after{content:"▾";margin-left:auto;color:var(--texto-2)}
@@ -204,11 +204,16 @@ table.ranking{min-width:0;width:100%}
 #tabSim{width:100%}
 #tabSim td,#tabSim th{padding:5px 3px}
 #tabSim th{white-space:nowrap}
-#tabSim .fim{border-left:2px solid var(--texto);padding-left:8px}
-#tabSim .sg{padding-right:12px}
+#tabSim .fim{border-left:2px solid var(--texto);padding-left:10px;text-align:left!important}
+#tabSim .sg{padding-right:10px}
 #tabSim th.fim{border-left:2px solid var(--texto)}
 #tabSim .mudou{font-weight:700;color:var(--roxo)}
-#tabSim .dlt{display:block;margin:0;line-height:1.1}
+#tabSim .mudou-n{font-weight:400;color:var(--texto)}
+#tabSim .dlt{display:inline-block;margin-left:3px;min-width:24px;text-align:left}
+#tabSim td.lc{white-space:nowrap}
+#tabSim th.lc{padding-right:30px}
+#tabSim .pts-f{white-space:nowrap}
+#tabSim td.cai,#tabSim th.cai{padding-left:10px}
 @media (max-width:1150px){#tabSim .gpgc{display:none}}
 @media (max-width:520px){#tabSim .md{display:none}#tabSim .cl .nm{display:none}#tabSim{font-size:12.5px}}
 #tabSim td.n,#tabSim th.n{text-align:right}
@@ -245,7 +250,7 @@ html.modo-video .abas{display:none}
   </header>
 
   <div class="barra-ctl">
-    <button class="btn pri" id="btnSort" type="button" title="sorteia um placar para cada jogo que está no Modelo, rodada a rodada, e o campeão de cada final">Sortear os jogos</button>
+    <button class="btn pri btnSort" id="btnSort" type="button" title="sorteia um placar para cada jogo que está no Modelo, rodada a rodada, e o campeão de cada final">Sortear</button>
     <span class="cont"><b id="nEsc">0</b> de <span id="nTot"></span> jogos com resultado</span>
     <button class="btn" id="btnZera" type="button">Limpar</button>
     <button class="btn" id="btnLink" type="button">Copiar link desta simulação</button>
@@ -261,17 +266,17 @@ html.modo-video .abas{display:none}
         <div id="finais"></div>
       </div>
       <h2 id="tJogos" style="margin:0 0 2px">Os jogos que faltam</h2>
-      <p class="h2sub" style="margin:0 0 10px">Todo jogo começa em <b>Modelo</b>: ele fica em aberto e, a cada mudança, o simulador joga a reta final <span class="mN3"></span> vezes com as chances do modelo (as porcentagens dos botões; a barrinha lilás mostra o peso de cada uma). É isso que dá as chances de <b>Como termina</b>. Para fixar um jogo, clique no resultado ou digite o placar (o placar entra no saldo). Para ver uma temporada possível inteira, use <b>Sortear os jogos</b>: ele sorteia um placar para cada jogo em aberto, rodada a rodada, e a tabela vai andando. Clique de novo para outra temporada.</p>
-      <div class="filtro"><span id="rotF">Mostrar jogos de</span><div class="sel-esc" id="selF"></div></div>
+      <p class="h2sub" style="margin:0 0 10px">Todo jogo começa em <b>Modelo</b>: ele fica em aberto e, a cada mudança, o simulador joga a reta final <span class="mN3"></span> vezes com as chances do modelo (as porcentagens dos botões; a barrinha lilás mostra o peso de cada uma). É isso que dá as chances de <b>Como termina</b>. Para fixar um jogo, clique no resultado ou digite o placar (o placar entra no saldo). Para ver uma temporada possível inteira, use <b>Sortear</b>: ele sorteia um placar para cada jogo em aberto, rodada a rodada, e a tabela vai andando. Clique de novo para outra temporada.</p>
+      <div class="filtro"><span id="rotF">Mostrar jogos de</span><div class="sel-esc" id="selF"></div><button class="btn pri btnSort" id="btnSort2" type="button" title="sorteia um placar para cada jogo que está no Modelo, rodada a rodada, e o campeão de cada final">Sortear</button></div>
       <div id="jogos"></div>
     </section>
 
     <section class="sim-res" id="resultado" aria-labelledby="tRes" aria-live="polite">
       <h2 id="tRes" style="margin:0 0 2px">Como termina</h2>
-      <p class="h2sub" style="margin:0">A tabela vai somando os resultados que você escolhe. À direita, como termina em <span id="mN"></span> cenários, com a diferença para o painel embaixo (em pontos percentuais, quando passa de 1).</p>
+      <p class="h2sub" style="margin:0">A tabela vai somando os resultados que você escolhe. À direita, como termina em <span id="mN"></span> cenários, com a diferença para o painel ao lado (em pontos percentuais, quando passa de 1).</p>
       <div class="g-cards" id="gCards"></div>
       <div class="tabela-wrap"><table class="ranking" id="tabSim"></table></div>
-      <p class="nota" style="margin-top:6px"><b>P</b>, <b>J</b>, <b>V</b>, <b>E</b>, <b>D</b>, <b>GP</b>, <b>GC</b>, <b>SG</b>: a tabela de hoje mais os jogos que você escolheu (em roxo, o que mudou); jogo escolhido sem placar conta nos pontos, mas não nos gols. Desempate: pontos, vitórias, saldo, gols pró. <b>Fim</b>: pontos no fim do campeonato (média dos cenários; embaixo, o mínimo e o máximo) · <b>Lib.</b>: chance de Libertadores (grupos + pré) · <b>Cai</b>: chance de terminar entre o 17º e o 20º. Faixa lilás: os quatro últimos da tabela. No celular, E, D, GP e GC ficam ocultos.</p>
+      <p class="nota" style="margin-top:6px"><b>P</b>, <b>J</b>, <b>V</b>, <b>E</b>, <b>D</b>, <b>GP</b>, <b>GC</b>, <b>SG</b>: a tabela de hoje mais os jogos que você escolheu (em roxo, os pontos que mudaram); jogo escolhido sem placar conta nos pontos, mas não nos gols. Desempate: pontos, vitórias, saldo, gols pró. <b>Fim</b>: pontos no fim do campeonato (média dos cenários; embaixo, o mínimo e o máximo) · <b>Lib.</b>: chance de Libertadores (grupos + pré) · <b>Cai</b>: chance de terminar entre o 17º e o 20º. Faixa lilás: os quatro últimos da tabela. No celular, E, D, GP e GC ficam ocultos.</p>
       <p class="calc" id="calc"></p>
     </section>
   </div>
@@ -523,7 +528,7 @@ function tabelaCarregada() {
 function caiuCerto(r, rows) {
   const aberto = DADOS.jogos.filter(j => !ESC[chaveJ(j)] && (j.mandante === r.clube || j.visitante === r.clube)).length;
   const max = r.P + 3 * aberto;
-  return rows.filter(o => o.clube !== r.clube && o.P > max).length >= 16;
+  return aberto === 0 && DADOS.jogos.every(j => ESC[chaveJ(j)]) || rows.filter(o => o.clube !== r.clube && o.P > max).length >= 16;
 }
 
 /* resultado */
@@ -540,9 +545,9 @@ function desenhaResultado(R) {
   const tab = document.getElementById("tabSim");
   const th = (t, cls, title) => el("th", {class: cls || "", title: title || ""}, t);
   const cab = el("thead", {}, el("tr", {}, th("#", "n"), th("Clube"), th("P", "n"), th("J", "n"), th("V", "n"), th("E", "n md"), th("D", "n md"),
-    th("GP", "n gpgc md"), th("GC", "n gpgc md"), th("SG", "n sg"), th("Fim", "n fim", "pontos no fim (média dos cenários)"), th("Lib.", "n"), th("Cai", "n")));
+    th("GP", "n gpgc md"), th("GC", "n gpgc md"), th("SG", "n sg"), th("Fim", "n fim", "pontos no fim (média dos cenários)"), th("Lib.", "n lc"), th("Cai", "n lc cai")));
   const corpo = el("tbody");
-  const td = (v, k, r, cls) => el("td", {class: "n " + (cls || "")}, el("span", {class: r[k] !== HOJE[r.clube][k] ? "mudou" : ""}, k === "SG" && v > 0 ? "+" + v : v));
+  const td = (v, k, r, cls) => el("td", {class: "n " + (cls || "")}, el("span", {class: r[k] !== HOJE[r.clube][k] && k === "P" ? "mudou" : ""}, k === "SG" && v > 0 ? "+" + v : v));
   rows.forEach((r, i) => {
     const f = FIM[r.clube], pts = f.ptsMin === f.ptsMax ? String(f.ptsMin) : num1(f.pts);
     const tr = el("tr", {class: (i >= 16 ? "z4" : "") + (i === 15 ? " corte" : "")},
@@ -551,15 +556,16 @@ function desenhaResultado(R) {
       td(r.P, "P", r, ""), td(r.J, "J", r), td(r.V, "V", r), td(r.E, "E", r, "md"), td(r.D, "D", r, "md"),
       td(r.GP, "GP", r, "gpgc md"), td(r.GC, "GC", r, "gpgc md"), td(r.SG, "SG", r, "sg"),
       el("td", {class: "n fim"}, el("b", {}, pts), f.ptsMin !== f.ptsMax ? el("span", {class: "pts-f"}, f.ptsMin + "–" + f.ptsMax) : null),
-      el("td", {class: "n"}, el("span", {class: f.lib >= 50 ? "forte" : ""}, pc(f.lib)), delta(f.lib, REF[r.clube].lib)),
-      el("td", {class: "n"}, el("span", {class: f.cai >= 50 ? "forte" : ""}, f.cai === 100 && !caiuCerto(r, rows) ? ">99%" : pc(f.cai)), delta(f.cai, REF[r.clube].cai, true)));
+      el("td", {class: "n lc"}, el("span", {class: f.lib === 100 ? "forte" : ""}, pc(f.lib)), delta(f.lib, REF[r.clube].lib) || el("span", {class: "dlt"})),
+      el("td", {class: "n lc cai"}, el("span", {class: f.cai === 100 && caiuCerto(r, rows) ? "forte" : ""}, f.cai === 100 && !caiuCerto(r, rows) ? ">99%" : pc(f.cai)), delta(f.cai, REF[r.clube].cai, true) || el("span", {class: "dlt"})));
     corpo.append(tr);
   });
   tab.replaceChildren(cab, corpo);
 }
 /* "Sortear os jogos": uma temporada possível, com placar, rodada a rodada (os jogos já definidos pela pessoa ficam) */
 const SORT = new Set(), FSORT = new Set();
-const btnSort = document.getElementById("btnSort");
+const BTNS = [...document.querySelectorAll(".btnSort")];
+const rotSort = t => BTNS.forEach(b => b.textContent = t);
 let animando = false;
 const escolheIdx = ps => { let x = Math.random(), a = 0; for (let i = 0; i < ps.length; i++) { a += ps[i]; if (x < a) return i; } return ps.length - 1; };
 function placarSorteado(j) {
@@ -568,21 +574,22 @@ function placarSorteado(j) {
   const m = 1 + escolheIdx([0.6, 0.28, 0.12]), l = escolheIdx([0.55, 0.35, 0.10]);   // mesma margem da simulação
   return u < j.pm ? [l + m, l] : [l, l + m];
 }
-btnSort.onclick = async () => {
-  if (animando) return; animando = true; btnSort.disabled = true;
+const sortear = async () => {
+  if (animando) return; animando = true; BTNS.forEach(b => b.disabled = true);
   for (const k of SORT) delete ESC[k]; SORT.clear();
   for (const k of FSORT) FIN[k] = null; FSORT.clear();
   for (const k of ["sula", "lib", "copa"]) if (FIN[k] == null) { FIN[k] = Math.random() < DADOS.finais[k].prob; FSORT.add(k); }
   desenhaFinais();
   const rods = [...new Set(DADOS.jogos.map(j => j.rodada))].sort((a, b) => a - b);
   for (const r of rods) {
-    btnSort.textContent = `Sorteando a ${r}ª…`;
+    rotSort(`Sorteando a ${r}ª…`);
     for (const j of DADOS.jogos.filter(j => j.rodada === r)) { const k = chaveJ(j); if (!ESC[k]) { ESC[k] = placarSorteado(j); SORT.add(k); } }
     desenhaJogos(); muda();
     await new Promise(ok => setTimeout(ok, 900));
   }
-  animando = false; btnSort.disabled = false; btnSort.textContent = "Sortear de novo";
+  animando = false; BTNS.forEach(b => b.disabled = false); rotSort("Sortear de novo");
 };
+BTNS.forEach(b => b.onclick = sortear);
 let pend = null;
 function calcula() {
   const t = performance.now();
@@ -601,7 +608,7 @@ function muda() {
   document.getElementById("calc").textContent = "Calculando…";
   clearTimeout(pend); pend = setTimeout(calcula, 60);
 }
-document.getElementById("btnZera").onclick = () => { if (animando) return; for (const k in ESC) delete ESC[k]; SORT.clear(); FSORT.clear(); btnSort.textContent = "Sortear os jogos";
+document.getElementById("btnZera").onclick = () => { if (animando) return; for (const k in ESC) delete ESC[k]; SORT.clear(); FSORT.clear(); rotSort("Sortear");
   for (const k of ["sula", "lib", "copa"]) { const p = DADOS.finais[k].prob; FIN[k] = p >= 1 ? true : p <= 0 ? false : null; }
   desenhaFinais(); desenhaJogos(); muda(); };
 document.getElementById("btnLink").onclick = async () => {
