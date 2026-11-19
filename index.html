@@ -404,9 +404,11 @@ document.getElementById("mSub").textContent = META.sub;
 document.getElementById("mMuda").textContent = META.muda;
 document.querySelectorAll(".mFaltam").forEach(e => e.textContent = META.faltam);
 document.querySelectorAll(".mFoto").forEach(e => e.textContent = META.foto);
-const FOCO = ["Grêmio", "Corinthians", "Vitória", "Internacional"];
+
 // quem já chegou aos 44 (lista fora_indice_z4 do estado) sai da briga no painel: chance, como termina, 44 pontos e índice; segue na tabela de quem ainda pode cair
 const CLUBES = DADOS.clubes.filter(r => r.no_indice !== false);
+// destaque (roxo): os quatro com mais chance de cair hoje, recalculado a cada atualização
+const FOCO = [...CLUBES].sort((a, b) => b.chance_cair - a.chance_cair).slice(0, 4).map(r => r.clube);
 const ESC_NOME = n => n;
 const NOME = n => n;
 const VERM = "#C62828";
