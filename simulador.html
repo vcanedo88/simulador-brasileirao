@@ -153,7 +153,8 @@ table.ranking{min-width:0;width:100%}
 .fin{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--linha)}
 .fin .tit{font-size:14px;font-weight:700}
 .fin .tit span{display:block;font-weight:400;font-size:12px;color:var(--texto-2)}
-@media (max-width:560px){.fin{grid-template-columns:1fr}}
+@media (max-width:560px){.fin{grid-template-columns:1fr}.fin .seg{display:flex;width:100%}.fin .seg button{flex:1 1 auto;min-width:0}}
+@media (max-width:420px){.fin .seg button{white-space:normal;padding:4px 5px;font-size:11.5px;line-height:1.15}.fin .seg button.mod{flex:0 0 auto}}
 .seg{display:inline-flex;flex-wrap:nowrap;border:1px solid var(--cinza)}
 .seg button{font:500 12.5px var(--sans);display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:5px 9px;border:0;border-left:1px solid var(--cinza);background:var(--fundo);color:var(--texto);cursor:pointer;white-space:nowrap;min-height:32px}
 .seg button:first-child{border-left:0}
@@ -255,7 +256,7 @@ html.modo-video .abas{display:none}
   </header>
 
   <div class="barra-ctl">
-    <button class="btn pri btnSort" id="btnSort" type="button" title="sorteia um placar para cada jogo que está no Modelo, rodada a rodada, e o campeão de cada final">Sortear</button>
+    <button class="btn pri btnSort" id="btnSort" type="button" title="sorteia um placar para cada jogo que está no Modelo, rodada a rodada, e o campeão da Sul-Americana e da Libertadores">Sortear</button>
     <span class="cont"><b id="nEsc">0</b> de <span id="nTot"></span> jogos com resultado</span>
     <button class="btn btnZera" id="btnZera" type="button">Limpar</button>
     <button class="btn" id="btnLink" type="button">Copiar link desta simulação</button>
@@ -267,12 +268,12 @@ html.modo-video .abas{display:none}
     <section class="sim-jogos" aria-labelledby="tJogos">
       <div class="finais">
         <h2 style="margin:0 0 2px">As finais</h2>
-        <p class="h2sub" style="margin:0 0 4px">Mudam o tamanho do G. Em <b>Modelo</b>, o campeão é sorteado em cada cenário com as chances do mercado (as porcentagens). Clique num clube para fixá-lo campeão.</p>
+        <p class="h2sub" style="margin:0 0 4px">Mudam o tamanho do G. A final da Copa do Brasil não entra: Palmeiras e Grêmio já vão à Libertadores por ela, e a vaga do Grêmio só volta à tabela se ele cair. Em <b>Modelo</b>, o campeão é sorteado em cada cenário com as chances do mercado (as porcentagens). Clique num clube para fixá-lo campeão.</p>
         <div id="finais"></div>
       </div>
       <h2 id="tJogos" style="margin:0 0 2px">Os jogos que faltam</h2>
       <p class="h2sub" style="margin:0 0 10px">Todo jogo começa em <b>Modelo</b>: ele fica em aberto e, a cada mudança, o simulador joga a reta final <span class="mN3"></span> vezes com as chances do modelo (as porcentagens dos botões; a barrinha lilás mostra o peso de cada uma). É isso que dá as chances de <b>Como termina</b>. Para fixar um jogo, clique no resultado ou digite o placar (o placar entra no saldo). Para ver uma temporada possível inteira, use <b>Sortear</b>: ele sorteia cada jogo em aberto, rodada a rodada, e a tabela vai andando. O resultado sai das chances do modelo; o placar, do xG da temporada (o ataque de um contra a defesa do outro, com o mando de campo). Clique de novo para outra temporada; <b>Limpar</b> volta tudo ao Modelo.</p>
-      <div class="filtro"><span id="rotF">Mostrar jogos de</span><div class="sel-esc" id="selF"></div><button class="btn pri btnSort" id="btnSort2" type="button" title="sorteia um placar para cada jogo que está no Modelo, rodada a rodada, e o campeão de cada final">Sortear</button><button class="btn btnZera" id="btnZera2" type="button">Limpar</button></div>
+      <div class="filtro"><span id="rotF">Mostrar jogos de</span><div class="sel-esc" id="selF"></div><button class="btn pri btnSort" id="btnSort2" type="button" title="sorteia um placar para cada jogo que está no Modelo, rodada a rodada, e o campeão da Sul-Americana e da Libertadores">Sortear</button><button class="btn btnZera" id="btnZera2" type="button">Limpar</button></div>
       <div id="jogos"></div>
     </section>
 
@@ -383,7 +384,7 @@ const el = (tag, attrs = {}, ...kids) => {
   return e;
 };
 const escudo = c => ESCUDOS[c] ? el("img", {src: ESCUDOS[c], alt: ""}) : null;
-const CURTO = {"Internacional": "Inter", "Athletico-PR": "Athletico", "Chapecoense": "Chape", "Atlético-MG": "Galo", "Bragantino": "Bragantino", "Corinthians": "Corinthians"};
+const CURTO = {"Internacional": "Inter", "Athletico-PR": "Athletico", "Chapecoense": "Chape", "Bragantino": "Bragantino", "Corinthians": "Corinthians"};
 const curto = c => CURTO[c] || c;
 document.getElementById("logoCamp").replaceChildren(el("img", {class: "logo-camp", src: LOGO_CAMP, alt: "Brasileirão"}));
 for (const id of ["assinatura", "assinatura2"]) { const s = document.getElementById(id); if (s) s.replaceChildren(el("img", {src: SIMBOLO, alt: "Canedo", style: "height:40px"})); }
@@ -395,8 +396,11 @@ document.getElementById("mFin").textContent = "chance do " + (DADOS.meta.fonte_f
 
 /* estado: escolhas por jogo ("m" | "e" | "v" | [gm, gv]) e finais (null = chance, true/false) */
 const chaveJ = j => j.mandante + " x " + j.visitante;
+// a final da Copa do Brasil (Palmeiras x Grêmio) não muda nenhuma vaga da tabela: os dois já vão à Libertadores por ela
+// (o Palmeiras pelo G4; o Grêmio como campeão ou vice, se não cair). Fica no sorteio interno, sem botão.
+const FINAIS = ["sula", "lib"];
 const ESC = {}, FIN = {sula: null, lib: null, copa: null};
-for (const k of ["sula", "lib", "copa"]) { const p = DADOS.finais[k].prob; if (p >= 1) FIN[k] = true; else if (p <= 0) FIN[k] = false; }
+for (const k of FINAIS) { const p = DADOS.finais[k].prob; if (p >= 1) FIN[k] = true; else if (p <= 0) FIN[k] = false; }
 function leHash() {
   const h = new URLSearchParams(location.hash.slice(1));
   const validos = new Set(DADOS.jogos.map(chaveJ));
@@ -407,7 +411,7 @@ function leHash() {
     if (/^\d{1,2}-\d{1,2}$/.test(v)) ESC[k] = v.split("-").map(Number); else if (["m", "e", "v"].includes(v)) ESC[k] = v;
   }
   for (const it of (h.get("f") || "").split(",").filter(Boolean)) {
-    const k = {s: "sula", l: "lib", c: "copa"}[it[0]]; if (!k) continue;
+    const k = {s: "sula", l: "lib"}[it[0]]; if (!k) continue;
     const p = DADOS.finais[k].prob; if (p > 0 && p < 1) FIN[k] = it[1] === "1" ? true : it[1] === "0" ? false : null;
   }
 }
@@ -423,14 +427,14 @@ function gravaHash() {
 function desenhaFinais() {
   const L = {sula: ["Sul-Americana", "Atlético-MG x Boca Juniors"], lib: ["Libertadores", "Palmeiras x Estudiantes"], copa: ["Copa do Brasil", "Palmeiras x Grêmio"]};
   const box = document.getElementById("finais"); box.replaceChildren();
-  for (const k of ["sula", "lib", "copa"]) {
+  for (const k of FINAIS) {
     const F = DADOS.finais[k], dec = F.prob >= 1 || F.prob <= 0;
     const tit = el("div", {class: "tit"}, L[k][0], el("span", {}, L[k][1] + (F.quando ? ", " + F.quando : "")));
     if (dec) { box.append(el("div", {class: "fin"}, tit, el("span", {style: "font-size:13px;font-weight:700"}, "Decidida: " + (F.prob >= 1 ? F.campeao : F.rival) + " campeão"))); continue; }
     const seg = el("div", {class: "seg", role: "group", "aria-label": "Final da " + L[k][0]});
-    const nomeR = {"Boca Juniors": "Boca", "Estudiantes": "Estudiantes"}[F.rival] || F.rival;
+    const nomeR = F.rival;
     const pa = Math.round(100 * F.prob);   // os dois lados somam 100
-    const ops = [[null, ["Modelo"], "mod", null], [true, [escudo(F.campeao), curto(F.campeao) + " ", el("span", {class: "p"}, pa + "%")], "", F.prob],
+    const ops = [[null, ["Modelo"], "mod", null], [true, [escudo(F.campeao), F.campeao + " ", el("span", {class: "p"}, pa + "%")], "", F.prob],
                  [false, [escudo(F.rival), nomeR + " ", el("span", {class: "p"}, (100 - pa) + "%")], "", 1 - F.prob]];
     for (const [v, kids, cls, peso] of ops) {
       const b = el("button", {type: "button", class: cls, "aria-pressed": String(FIN[k] === v), title: v == null ? "em aberto: em cada cenário, o campeão sai pelas chances do mercado" : (v ? F.campeao : F.rival) + " campeão"}, ...kids,
@@ -587,7 +591,7 @@ const sortear = async () => {
   if (animando) return; animando = true; BTNS.forEach(b => b.disabled = true);
   for (const k of SORT) delete ESC[k]; SORT.clear();
   for (const k of FSORT) FIN[k] = null; FSORT.clear();
-  for (const k of ["sula", "lib", "copa"]) if (FIN[k] == null) { FIN[k] = Math.random() < DADOS.finais[k].prob; FSORT.add(k); }
+  for (const k of FINAIS) if (FIN[k] == null) { FIN[k] = Math.random() < DADOS.finais[k].prob; FSORT.add(k); }
   desenhaFinais();
   const rods = [...new Set(DADOS.jogos.map(j => j.rodada))].sort((a, b) => a - b);
   for (const r of rods) {
@@ -604,21 +608,21 @@ function calcula() {
   const t = performance.now();
   const R = simula(DADOS, ESC, FIN, NSIM, 2026);
   desenhaResultado(R);
-  const nf = Object.keys(ESC).length, nab = DADOS.jogos.length - nf, fab = ["sula", "lib", "copa"].filter(k => FIN[k] == null).length;
+  const nf = Object.keys(ESC).length, nab = DADOS.jogos.length - nf, fab = FINAIS.filter(k => FIN[k] == null).length;
   const pl = (n, a, b) => n + " " + (n === 1 ? a : b);
   document.getElementById("calc").textContent = (nab || fab ? `Em aberto (no Modelo): ${pl(nab, "jogo", "jogos")} e ${pl(fab, "final", "finais")}, jogados ${NSIM / 1000} mil vezes. ` : "Tudo definido: a tabela acima é a final (só o desempate por sorteio varia). ")
     + `Com resultado: ${pl(nf, "jogo", "jogos")}${SORT.size ? ` (${SORT.size} sorteados)` : ""}. Calculado em ${Math.round(performance.now() - t)} ms.`;
 }
 function muda() {
   document.getElementById("nEsc").textContent = Object.keys(ESC).length;
-  const temEscolha = Object.keys(ESC).length > 0 || ["sula", "lib", "copa"].some(k => FIN[k] != null && DADOS.finais[k].prob > 0 && DADOS.finais[k].prob < 1);
+  const temEscolha = Object.keys(ESC).length > 0 || FINAIS.some(k => FIN[k] != null && DADOS.finais[k].prob > 0 && DADOS.finais[k].prob < 1);
   document.querySelectorAll(".btnZera").forEach(bz => { bz.disabled = !temEscolha; bz.title = temEscolha ? "volta todos os jogos e finais ao Modelo" : "nada definido: tudo já está no Modelo"; });
   gravaHash();
   document.getElementById("calc").textContent = "Calculando…";
   clearTimeout(pend); pend = setTimeout(calcula, 60);
 }
 const limpar = () => { if (animando) return; for (const k in ESC) delete ESC[k]; SORT.clear(); FSORT.clear(); rotSort("Sortear");
-  for (const k of ["sula", "lib", "copa"]) { const p = DADOS.finais[k].prob; FIN[k] = p >= 1 ? true : p <= 0 ? false : null; }
+  for (const k of FINAIS) { const p = DADOS.finais[k].prob; FIN[k] = p >= 1 ? true : p <= 0 ? false : null; }
   desenhaFinais(); desenhaJogos(); muda(); };
 document.querySelectorAll(".btnZera").forEach(b => b.onclick = limpar);
 document.getElementById("btnLink").onclick = async () => {
