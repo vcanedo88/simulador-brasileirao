@@ -257,7 +257,7 @@ html.modo-video .abas{display:none}
   <div class="barra-ctl">
     <button class="btn pri btnSort" id="btnSort" type="button" title="sorteia um placar para cada jogo que está no Modelo, rodada a rodada, e o campeão de cada final">Sortear</button>
     <span class="cont"><b id="nEsc">0</b> de <span id="nTot"></span> jogos com resultado</span>
-    <button class="btn" id="btnZera" type="button">Limpar</button>
+    <button class="btn btnZera" id="btnZera" type="button">Limpar</button>
     <button class="btn" id="btnLink" type="button">Copiar link desta simulação</button>
     <span class="copiado" id="copiado" hidden>Link copiado</span>
     <input class="link-box" id="linkBox" readonly aria-label="Link desta simulação">
@@ -271,8 +271,8 @@ html.modo-video .abas{display:none}
         <div id="finais"></div>
       </div>
       <h2 id="tJogos" style="margin:0 0 2px">Os jogos que faltam</h2>
-      <p class="h2sub" style="margin:0 0 10px">Todo jogo começa em <b>Modelo</b>: ele fica em aberto e, a cada mudança, o simulador joga a reta final <span class="mN3"></span> vezes com as chances do modelo (as porcentagens dos botões; a barrinha lilás mostra o peso de cada uma). É isso que dá as chances de <b>Como termina</b>. Para fixar um jogo, clique no resultado ou digite o placar (o placar entra no saldo). Para ver uma temporada possível inteira, use <b>Sortear</b>: ele sorteia cada jogo em aberto, rodada a rodada, e a tabela vai andando. O resultado sai das chances do modelo; o placar, do xG da temporada (o ataque de um contra a defesa do outro, com o mando de campo). Clique de novo para outra temporada.</p>
-      <div class="filtro"><span id="rotF">Mostrar jogos de</span><div class="sel-esc" id="selF"></div><button class="btn pri btnSort" id="btnSort2" type="button" title="sorteia um placar para cada jogo que está no Modelo, rodada a rodada, e o campeão de cada final">Sortear</button></div>
+      <p class="h2sub" style="margin:0 0 10px">Todo jogo começa em <b>Modelo</b>: ele fica em aberto e, a cada mudança, o simulador joga a reta final <span class="mN3"></span> vezes com as chances do modelo (as porcentagens dos botões; a barrinha lilás mostra o peso de cada uma). É isso que dá as chances de <b>Como termina</b>. Para fixar um jogo, clique no resultado ou digite o placar (o placar entra no saldo). Para ver uma temporada possível inteira, use <b>Sortear</b>: ele sorteia cada jogo em aberto, rodada a rodada, e a tabela vai andando. O resultado sai das chances do modelo; o placar, do xG da temporada (o ataque de um contra a defesa do outro, com o mando de campo). Clique de novo para outra temporada; <b>Limpar</b> volta tudo ao Modelo.</p>
+      <div class="filtro"><span id="rotF">Mostrar jogos de</span><div class="sel-esc" id="selF"></div><button class="btn pri btnSort" id="btnSort2" type="button" title="sorteia um placar para cada jogo que está no Modelo, rodada a rodada, e o campeão de cada final">Sortear</button><button class="btn btnZera" id="btnZera2" type="button">Limpar</button></div>
       <div id="jogos"></div>
     </section>
 
@@ -596,7 +596,7 @@ const sortear = async () => {
     desenhaJogos(); muda();
     await new Promise(ok => setTimeout(ok, 900));
   }
-  animando = false; BTNS.forEach(b => b.disabled = false); rotSort("Sortear de novo");
+  animando = false; BTNS.forEach(b => b.disabled = false); rotSort("Sortear");
 };
 BTNS.forEach(b => b.onclick = sortear);
 let pend = null;
@@ -612,14 +612,15 @@ function calcula() {
 function muda() {
   document.getElementById("nEsc").textContent = Object.keys(ESC).length;
   const temEscolha = Object.keys(ESC).length > 0 || ["sula", "lib", "copa"].some(k => FIN[k] != null && DADOS.finais[k].prob > 0 && DADOS.finais[k].prob < 1);
-  const bz = document.getElementById("btnZera"); bz.disabled = !temEscolha; bz.title = temEscolha ? "volta todos os jogos e finais ao Modelo" : "nada definido: tudo já está no Modelo";
+  document.querySelectorAll(".btnZera").forEach(bz => { bz.disabled = !temEscolha; bz.title = temEscolha ? "volta todos os jogos e finais ao Modelo" : "nada definido: tudo já está no Modelo"; });
   gravaHash();
   document.getElementById("calc").textContent = "Calculando…";
   clearTimeout(pend); pend = setTimeout(calcula, 60);
 }
-document.getElementById("btnZera").onclick = () => { if (animando) return; for (const k in ESC) delete ESC[k]; SORT.clear(); FSORT.clear(); rotSort("Sortear");
+const limpar = () => { if (animando) return; for (const k in ESC) delete ESC[k]; SORT.clear(); FSORT.clear(); rotSort("Sortear");
   for (const k of ["sula", "lib", "copa"]) { const p = DADOS.finais[k].prob; FIN[k] = p >= 1 ? true : p <= 0 ? false : null; }
   desenhaFinais(); desenhaJogos(); muda(); };
+document.querySelectorAll(".btnZera").forEach(b => b.onclick = limpar);
 document.getElementById("btnLink").onclick = async () => {
   const url = location.href, ok = document.getElementById("copiado"), box = document.getElementById("linkBox");
   try { await navigator.clipboard.writeText(url); ok.hidden = false; setTimeout(() => ok.hidden = true, 2500); box.classList.remove("on"); }
