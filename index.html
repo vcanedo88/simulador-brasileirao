@@ -259,6 +259,10 @@ html.modo-video .h2sub{font-size:14px}
 html.modo-video .video-nav{display:flex;position:fixed;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));gap:6px;align-items:center;font:600 12px var(--sans);color:var(--texto-2);opacity:.25;transition:opacity .2s;z-index:20}
 html.modo-video .video-nav:hover{opacity:1}
 .video-nav button{font:inherit;border:1px solid var(--cinza);background:var(--fundo);color:var(--texto);width:30px;height:30px;cursor:pointer}
+/* índice: a Dif. de cada jogo fica embaixo da Dif. do clube (as 3 primeiras colunas da lista de jogos copiam a largura das de cima) */
+@media (max-width:400px){#tabAuto th,#tabIndice th{letter-spacing:0;font-size:9px}#tabAuto th,#tabAuto td{padding-left:1px;padding-right:1px}}@media (max-width:340px){#tabAuto,#tabIndice{font-size:11px}#tabIndice th,#tabIndice td{padding-left:1px;padding-right:1px}}
+#tabJogos.alinhada{table-layout:fixed}#tabJogos.alinhada th{box-sizing:border-box}
+#tabJogos.alinhada th:nth-child(1){width:var(--c1)}#tabJogos.alinhada th:nth-child(2){width:var(--c2)}#tabJogos.alinhada th:nth-child(3){width:var(--c3)}
 </style>
 <style>
 .abas{display:flex;gap:4px;margin:0 0 18px;border-bottom:1px solid var(--cinza,#E3E3E3)}
@@ -624,6 +628,7 @@ function desenhaJogos() {
   tabela("tabJogos", rows, [
     {rot: "", val: r => r.clube, cel: r => clube(r.clube)},
     {rot: "Rod.", val: r => r.rodada, cel: r => r.rodada + "ª", n: true},
+    {rot: "Dif.", val: r => r.dificuldade, cel: r => el("span", {class: "dif " + faixa(r.dificuldade)}, Math.round(r.dificuldade)), n: true},
     {rot: "Adv.", val: r => r.adversario, cel: r => { const i = escudo(r.adversario); i.alt = r.adversario; return el("span", {class: "adv so", title: r.adversario}, i); }},
     {rot: "Local", val: r => r.local, cel: r => r.local === "casa" ? "C" : "F"},
     {rot: "Adv. ano", val: r => r.adv_aprov, cel: r => Math.round(r.adv_aprov) + "%", n: true, so: "lg"},
@@ -631,7 +636,6 @@ function desenhaJogos() {
     {rot: "xG adv. ano", val: r => r.adv_xg_ano, cel: r => sgn2(r.adv_xg_ano), n: true, so: "lg"},
     {rot: "xG adv. 6j", val: r => r.adv_xg, cel: r => sgn2(r.adv_xg), n: true, so: "lg"},
     {rot: "Pts adv. 6j", val: r => r.adv_pts6, n: true, so: "lg"},
-    {rot: "Dif.", val: r => r.dificuldade, cel: r => el("span", {class: "dif " + faixa(r.dificuldade)}, Math.round(r.dificuldade)), n: true},
     {rot: "Vence", val: r => r.vitoria, cel: r => pc(r.vitoria), n: true},
     {rot: "Empata", val: r => r.empate, cel: r => pc(r.empate), n: true},
     {rot: "Pts esp.", val: r => r.pontos_esperados, cel: r => num1(r.pontos_esperados), n: true},
@@ -663,6 +667,15 @@ function desenhaJogos() {
 
 function tudo() { desenhaFinal(); desenhaCurva(); }
 desenhaJogos(); tudo();
+
+/* alinha a Dif. dos jogos com a Dif. dos clubes: copia a largura das 3 primeiras colunas de cima */
+(function () {
+  const cima = document.getElementById("tabIndice"), baixo = document.getElementById("tabJogos");
+  const alinha = () => { const th = [...cima.querySelectorAll("thead th")].slice(0, 3).map(t => t.getBoundingClientRect().width);
+    if (th.length < 3 || !th[0]) return;
+    th.forEach((w, i) => baixo.style.setProperty("--c" + (i + 1), w + "px")); baixo.classList.add("alinhada"); };
+  new ResizeObserver(alinha).observe(cima); alinha();
+})();
 
 /* autocrítica do modelo */
 { const PV = [...DADOS.previsoes].reverse();
