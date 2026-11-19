@@ -260,9 +260,17 @@ html.modo-video .video-nav{display:flex;position:fixed;right:calc(14px + env(saf
 html.modo-video .video-nav:hover{opacity:1}
 .video-nav button{font:inherit;border:1px solid var(--cinza);background:var(--fundo);color:var(--texto);width:30px;height:30px;cursor:pointer}
 </style>
+<style>
+.abas{display:flex;gap:4px;margin:0 0 18px;border-bottom:1px solid var(--cinza,#E3E3E3)}
+.abas a{font:700 14px var(--sans,Poppins,sans-serif);color:var(--texto-2,#6B6B6B);text-decoration:none;padding:8px 14px;border-bottom:3px solid transparent;margin-bottom:-1px}
+.abas a:hover{color:var(--roxo,#400078)}
+.abas a[aria-current="page"]{color:var(--roxo,#400078);border-bottom-color:var(--roxo,#400078)}
+html.modo-video .abas{display:none}
+</style>
 </head>
 <body>
 <div class="pagina">
+  <nav class="abas" aria-label="Painéis"><a href="./" aria-current="page">Rebaixamento</a><a href="libertadores.html">Libertadores</a></nav>
   <svg class="escanteio" viewBox="0 0 140 140" aria-hidden="true"><path class="lados" d="M2 140V2H140"/><path class="arco" d="M2 42A40 40 0 0 0 42 2"/></svg>
   <header class="topo">
     <div id="logoCamp"></div>
