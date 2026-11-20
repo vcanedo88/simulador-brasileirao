@@ -656,25 +656,32 @@ function desenhaJogos() {
 
 
 
-/* exemplo do índice: primeiro jogo do Grêmio */
+/* exemplo do índice: o jogo escolhido para o passo a passo (pela ótica do mandante); quando ele for disputado,
+   passa para o próximo jogo do clube com mais chance de cair */
 (function () {
-  const jg = DADOS.jogos.filter(j => j.clube === "Grêmio" && !j.resultado).sort((a, b) => a.rodada - b.rodada);
-  const j = jg[0], fx = faixa(j.dificuldade), casa = j.local === "casa", G = C["Grêmio"];
+  const ESCOLHIDO = ["Internacional", "Vitória"];   // Inter x Vitória, 36ª rodada (pedido do Victor em 19/11)
+  const pend = (c, a) => DADOS.jogos.find(x => x.clube === c && x.adversario === a && !x.resultado && x.local === "casa");
+  let j = pend(...ESCOLHIDO), CL = ESCOLHIDO[0];
+  if (!j) { CL = FOCO[0] || "Grêmio"; j = DADOS.jogos.filter(x => x.clube === CL && !x.resultado).sort((a, b) => a.rodada - b.rodada)[0]; }
+  if (!j) return;
+  const jg = DADOS.jogos.filter(x => x.clube === CL && !x.resultado);
+  const fx = faixa(j.dificuldade), casa = j.local === "casa", G = C[CL] || DADOS.clubes.find(r => r.clube === CL);
   const linhas = [
     [`${j.adversario} ${casa ? "fora de casa" : "em casa"} no returno`, "peso 31%", Math.round(j.adv_local) + "%"],
     [`${j.adversario} no Brasileirão`, "peso 31%", Math.round(j.adv_aprov) + "%"],
     [`${j.adversario} no xG de 6 jogos`, "peso 31%", sgn2(j.adv_xg)],
     [`${j.adversario} em pontos nos 6 jogos`, "peso 7%", j.adv_pts6 + " de 18"],
-    [`Grêmio ${casa ? "em casa" : "fora"} no returno`, "entra junto com a primeira linha", Math.round(casa ? G.casa : G.fora) + "%"],
+    [`${CL} ${casa ? "em casa" : "fora"} no returno`, "entra junto com a primeira linha", Math.round(casa ? G.casa : G.fora) + "%"],
   ];
   const box = document.getElementById("exemplo");
-  // título na ordem oficial (mandante x visitante); a conta continua sendo a dificuldade do Grêmio
-  const [mand, vis] = casa ? ["Grêmio", j.adversario] : [j.adversario, "Grêmio"];
+  const [mand, vis] = casa ? [CL, j.adversario] : [j.adversario, CL];
   box.append(el("div", {class: "ex-topo"}, escudo(mand), mand + " x " + vis, escudo(vis), el("span", {}, `${j.rodada}ª rodada`)));
   for (const [a, b, v] of linhas) box.append(el("div", {class: "ex-linha"}, el("div", {}, a, el("small", {}, b)), el("div", {}), el("b", {}, v)));
-  box.append(el("div", {class: "ex-linha media"}, el("div", {}, "Dificuldade para o Grêmio", el("small", {}, `um time mediano deixaria ${Math.round(j.dificuldade)}% dos pontos`)), el("div", {}, el("span", {class: "dif " + fx}, NOMEF[fx])), el("b", {}, Math.round(j.dificuldade))));
+  box.append(el("div", {class: "ex-linha media"}, el("div", {}, "Dificuldade para o " + CL, el("small", {}, `um time mediano deixaria ${Math.round(j.dificuldade)}% dos pontos`)), el("div", {}, el("span", {class: "dif " + fx}, NOMEF[fx])), el("b", {}, Math.round(j.dificuldade))));
   const tot = jg.reduce((s, x) => s + x.pontos_esperados, 0);
-  box.append(el("p", {class: "ex-pe"}, `Para o Grêmio: vence ${pc(j.vitoria)}, empata ${pc(j.empate)}, ${num1(j.pontos_esperados)} ponto esperado. Somando os ${jg.length} jogos: ${G.pontos} + ${num1(tot)} = `, el("b", {}, num1(G.pontos + tot) + " pontos"), "."));
+  const outro = DADOS.jogos.find(x => x.clube === j.adversario && x.adversario === CL && x.rodada === j.rodada);
+  box.append(el("p", {class: "ex-pe"}, `Para o ${CL}: vence ${pc(j.vitoria)}, empata ${pc(j.empate)}, ${num1(j.pontos_esperados)} ponto esperado. Somando os ${jg.length} jogos: ${G.pontos} + ${num1(tot)} = `, el("b", {}, num1(G.pontos + tot) + " pontos"), "."
+    + (outro ? ` Do outro lado, a dificuldade para o ${j.adversario} é ${Math.round(outro.dificuldade)} e ele vence ${pc(outro.vitoria)}.` : "")));
 })();
 
 function tudo() { desenhaFinal(); desenhaCurva(); }
