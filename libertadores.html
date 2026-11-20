@@ -196,6 +196,18 @@ table.ranking{min-width:0;width:100%}
 .ex-linha.media{border-bottom:0;font-weight:700}
 .ex-linha.media b{color:var(--roxo);font-size:20px}
 .ex-pe{margin:10px 0 0;font-size:13px;color:var(--texto-2)}
+.exemplo{border:1px solid var(--linha);padding:14px 16px}
+.ex-topo{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:10px}
+.ex-topo img{width:30px;height:30px;object-fit:contain}
+.ex-topo span{color:var(--texto-2);font-weight:400;font-size:13px}
+.ex-linha{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 72px;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid var(--linha);font-size:14px}
+.ex-linha small{display:block;color:var(--texto-2);font-size:12px}
+.ex-linha .trilho{height:12px;background:var(--fundo-sutil)}
+.ex-linha .trilho i{display:block;height:100%;background:var(--cinza)}
+.ex-linha b{text-align:right;font-variant-numeric:tabular-nums;font-size:16px}
+.ex-linha.media{border-bottom:0;font-weight:700}
+.ex-linha.media b{color:var(--roxo);font-size:20px}
+.ex-pe{margin:10px 0 0;font-size:13px;color:var(--texto-2)}
 .ex-pe b{color:var(--roxo)}
 .pesos{border:1px solid var(--linha);padding:6px 16px}
 .peso-l{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 52px;gap:14px;align-items:center;padding:9px 0;border-bottom:1px solid var(--linha);font-size:14.5px;font-weight:600}
@@ -418,6 +430,8 @@ html.modo-video .abas{display:none}
         <p>G4 na fase de grupos e o 5º na pré. Campeões da Libertadores, da Sul-Americana e da Copa do Brasil vão aos grupos; o vice da Copa, à pré. Vaga de quem já está classificado ou caiu passa para a tabela. Rebaixado não joga a Libertadores.</p>
       </div>
     </div>
+    <h3 class="met-h3">Um jogo, passo a passo</h3>
+    <div class="exemplo" id="exemplo"></div>
     <div class="fora">
       <h3>O que fica de fora</h3>
       <p>Lesões, suspensões e a motivação de quem já não disputa nada. <span id="mPrem"></span> É uma fotografia de <span class="mFoto"></span>: o painel é atualizado depois de cada dia de jogos.</p>
@@ -681,6 +695,36 @@ tabela("tabPrecisa", PREC, [
 ], {i: 2, dir: -1});
 
 /* índice da reta final */
+
+/* exemplo do índice: o jogo escolhido para o passo a passo (pela ótica do mandante); quando ele for disputado,
+   passa para o próximo jogo do clube com a chance de Libertadores mais em aberto (mais perto de 50%) */
+(function () {
+  const ESCOLHIDO = ["Bragantino", "Vasco"];   // Bragantino x Vasco, 36ª rodada (pedido do Victor em 19/11)
+  const JI = DADOS.jogos_indice, IND = Object.fromEntries(DADOS.indice.map(r => [r.clube, r]));
+  let j = JI.find(x => x.clube === ESCOLHIDO[0] && x.adversario === ESCOLHIDO[1] && !x.resultado && x.local === "casa"), CL = ESCOLHIDO[0];
+  if (!j) { CL = [...DADOS.indice].sort((a, b) => Math.abs(a.lib - 50) - Math.abs(b.lib - 50))[0].clube;
+    j = JI.filter(x => x.clube === CL && !x.resultado).sort((a, b) => a.rodada - b.rodada)[0]; }
+  if (!j || !IND[CL]) return;
+  const NOMEF = {facil: "fácil", medio: "médio", dificil: "difícil", mdificil: "muito difícil"};
+  const G = IND[CL], jg = JI.filter(x => x.clube === CL && !x.resultado), casa = j.local === "casa", fx = faixa(j.dificuldade);
+  const linhas = [
+    [`${j.adversario} ${casa ? "fora de casa" : "em casa"} no returno`, "peso 31%", Math.round(j.adv_local) + "%"],
+    [`${j.adversario} no Brasileirão`, "peso 31%", Math.round(j.adv_aprov) + "%"],
+    [`${j.adversario} no xG de 6 jogos`, "peso 31%", sgn2(j.adv_xg)],
+    [`${j.adversario} em pontos nos 6 jogos`, "peso 7%", j.adv_pts6 + " de 18"],
+    [`${CL} ${casa ? "em casa" : "fora"} no returno`, "entra junto com a primeira linha", Math.round(casa ? G.casa : G.fora) + "%"],
+  ];
+  const box = document.getElementById("exemplo");
+  const [mand, vis] = casa ? [CL, j.adversario] : [j.adversario, CL];
+  box.append(el("div", {class: "ex-topo"}, escudo(mand), mand + " x " + vis, escudo(vis), el("span", {}, `${j.rodada}ª rodada`)));
+  for (const [a, b, v] of linhas) box.append(el("div", {class: "ex-linha"}, el("div", {}, a, el("small", {}, b)), el("div", {}), el("b", {}, v)));
+  box.append(el("div", {class: "ex-linha media"}, el("div", {}, "Dificuldade para o " + CL, el("small", {}, `um time mediano deixaria ${Math.round(j.dificuldade)}% dos pontos`)), el("div", {}, el("span", {class: "dif " + fx}, NOMEF[fx])), el("b", {}, Math.round(j.dificuldade))));
+  const tot = jg.reduce((s, x) => s + x.pontos_esperados, 0);
+  const outro = JI.find(x => x.clube === j.adversario && x.adversario === CL && x.rodada === j.rodada);
+  const libTxt = IND[j.adversario] ? ` Hoje, o ${CL} vai à Libertadores em ${pc(G.lib)} dos cenários e o ${j.adversario}, em ${pc(IND[j.adversario].lib)}.` : "";
+  box.append(el("p", {class: "ex-pe"}, `Para o ${CL}: vence ${pc(j.vitoria)}, empata ${pc(j.empate)}, ${num1(j.pontos_esperados)} ponto esperado. Somando os ${jg.length} jogos: ${G.pontos} + ${num1(tot)} = `, el("b", {}, num1(G.pontos + tot) + " pontos"), "."
+    + (outro ? ` Do outro lado, a dificuldade para o ${j.adversario} é ${Math.round(outro.dificuldade)} e ele vence ${pc(outro.vitoria)}.` : "") + libTxt));
+})();
 const POSL = Object.fromEntries(DADOS.tabela.map(r => [r.clube, r.pos]));
 tabela("tabIndice", [...DADOS.indice].sort((a, b) => POSL[a.clube] - POSL[b.clube]), [
   {rot: "", val: r => r.clube, cel: r => clube(r.clube)},
