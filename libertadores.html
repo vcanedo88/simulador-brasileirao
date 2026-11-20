@@ -559,7 +559,7 @@ document.getElementById("kpis").replaceChildren(...["6", "7", "8", "9"].map(g =>
         el("span", {}, `${T.pos}º · ${T.P} pts · máx. ${T.max}`)))); }
 
 
-function evolucao(id, linhas, valor, rotLinha, tip) {
+function evolucao(id, linhas, valor, rotLinha, tip, certoUlt) {
   const EV = DADOS.evolucao || [];
   const t = document.getElementById(id); if (!t || !EV.length) return;
   const cor = v => { const a = [0xF1, 0xEB, 0xF6], b = [0x40, 0x00, 0x78], k = Math.max(0, Math.min(1, Math.sqrt(v / 100))); return "rgb(" + a.map((x, i) => Math.round(x + (b[i] - x) * k)).join(",") + ")"; };
@@ -572,8 +572,8 @@ function evolucao(id, linhas, valor, rotLinha, tip) {
   const tb = el("tbody");
   linhas.forEach(r => {
     const row = el("tr", {}, el("td", {}, rotLinha(r)), el("td", {class: "n"}, r.P ?? r.pontos ?? ""));
-    EV.forEach(e => { const v = valor(e, r.clube); const td = el("td", {class: "n ev"});
-      td.append(v == null ? "–" : el("span", {class: "evc", style: `background:${cor(v)};color:${v >= 40 ? "#fff" : "var(--texto)"}`, title: tip ? tip(e, r.clube) : ""}, pc(v))); row.append(td); });
+    EV.forEach((e, i) => { const v = valor(e, r.clube); const td = el("td", {class: "n ev"});
+      td.append(i === EV.length - 1 && certoUlt && certoUlt(r.clube) ? el("span", {class: "evc"}, certoUlt(r.clube)) : v == null ? "–" : el("span", {class: "evc", style: `background:${cor(v)};color:${v >= 40 ? "#fff" : "var(--texto)"}`, title: tip ? tip(e, r.clube) : ""}, pc(v))); row.append(td); });
     if (EV.length > 1) { const a = valor(EV[EV.length - 2], r.clube), b = valor(EV[EV.length - 1], r.clube), d = (a == null || b == null) ? null : b - a;
       row.append(el("td", {class: "n dl " + (d > 0.05 ? "sobe" : d < -0.05 ? "desce" : "")}, d == null || Math.abs(d) < 0.05 ? "=" : (d > 0 ? "▲ " : "▼ ") + Math.abs(d).toLocaleString("pt-BR", {maximumFractionDigits: 1}))); }
     tb.append(row);
@@ -583,7 +583,8 @@ function evolucao(id, linhas, valor, rotLinha, tip) {
 
 { const CGx = Object.fromEntries(DADOS.clubes.map(r => [r.clube, r]));
   const L = DADOS.tabela.filter(r => r.pode_lib && r.lib > 0 && r.clube !== "Grêmio" && !(CGx[r.clube] && CGx[r.clube].grupos_garantido)).sort((a, b) => b.lib - a.lib);
-  evolucao("tabEvo", L, (e, c) => e.lib[c], r => clube(r.clube), (e, c) => `grupos ${pc(e.grupos[c] ?? 0)} · pré ${pc(e.pre[c] ?? 0)}`);
+  evolucao("tabEvo", L, (e, c) => e.lib[c], r => clube(r.clube), (e, c) => `grupos ${pc(e.grupos[c] ?? 0)} · pré ${pc(e.pre[c] ?? 0)}`,
+    c => CGx[c] && CGx[c].garantido ? certo("Libertadores garantida pela matemática") : null);
   // tamanho exato do G em cada coluna; o G6 é o mínimo garantido, então a linha dele é "só G6"
   evolucao("tabEvoG", ["6", "7", "8", "9"].map(g => ({clube: g, P: ""})), (e, g) => e.tamanho_g[g] || 0, r => el("b", {}, (r.clube === "6" ? "Só G" : "G") + r.clube)); }
 
