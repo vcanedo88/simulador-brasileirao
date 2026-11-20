@@ -696,12 +696,12 @@ tabela("tabPrecisa", PREC, [
 
 /* índice da reta final */
 
-/* exemplo do índice: o jogo escolhido para o passo a passo (pela ótica do mandante); quando ele for disputado,
+/* exemplo do índice: o jogo escolhido para o passo a passo, pela ótica do clube escolhido; quando ele for disputado,
    passa para o próximo jogo do clube com a chance de Libertadores mais em aberto (mais perto de 50%) */
 (function () {
-  const ESCOLHIDO = ["Bragantino", "Vasco"];   // Bragantino x Vasco, 36ª rodada (pedido do Victor em 19/11)
+  const ESCOLHIDO = ["Vasco", "Bragantino"];   // Bragantino x Vasco, 36ª rodada, pela ótica do Vasco (pedido do Victor em 19/11)
   const JI = DADOS.jogos_indice, IND = Object.fromEntries(DADOS.indice.map(r => [r.clube, r]));
-  let j = JI.find(x => x.clube === ESCOLHIDO[0] && x.adversario === ESCOLHIDO[1] && !x.resultado && x.local === "casa"), CL = ESCOLHIDO[0];
+  let j = JI.find(x => x.clube === ESCOLHIDO[0] && x.adversario === ESCOLHIDO[1] && !x.resultado), CL = ESCOLHIDO[0];
   if (!j) { CL = [...DADOS.indice].sort((a, b) => Math.abs(a.lib - 50) - Math.abs(b.lib - 50))[0].clube;
     j = JI.filter(x => x.clube === CL && !x.resultado).sort((a, b) => a.rodada - b.rodada)[0]; }
   if (!j || !IND[CL]) return;
