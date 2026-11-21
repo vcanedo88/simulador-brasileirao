@@ -231,6 +231,11 @@ table.ranking{min-width:0;width:100%}
 #tabSim .forte{font-weight:700;color:var(--roxo)}
 #tabSim .pts-f{color:var(--texto-2);font-size:11px;display:block;line-height:1;font-weight:400}
 .calc{font-size:12px;color:var(--texto-2);min-height:16px}
+#resultado.oculto .g-cards,#resultado.oculto .tabela-wrap,#resultado.oculto .nota,#resultado.oculto .calc,#resultado.oculto .h2sub{display:none}
+.sem-spoiler{display:none;margin-top:10px;padding:22px 16px;border:1px dashed var(--texto-2);background:var(--s1);text-align:center}
+#resultado.oculto .sem-spoiler{display:block}
+.sem-spoiler p{margin:0 0 12px;color:var(--texto-2);font-size:14px;line-height:1.45}
+.btnOcultar[aria-pressed="true"]{background:var(--s1)}
 .ir-res{display:none}
 @media (max-width:900px){.ir-res{display:block;position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;font:700 13px var(--sans);padding:9px 14px;background:var(--roxo);color:#fff;border:0;box-shadow:0 2px 8px rgba(0,0,0,.25)}}
 @media (max-width:420px){.seg button{padding:5px 6px;font-size:12px;gap:3px}.seg button img{width:16px;height:16px}.tm{font-size:13px}#tabSim{font-size:13px}.g-card b{font-size:20px}}
@@ -260,6 +265,7 @@ html.modo-video .abas{display:none}
     <button class="btn pri btnSort" id="btnSort" type="button" title="sorteia um placar para cada jogo que está no Modelo, dia a dia, e o campeão da Sul-Americana e da Libertadores">Sortear</button>
     <span class="cont"><b id="nEsc">0</b> de <span id="nTot"></span> jogos com resultado</span>
     <button class="btn btnZera" id="btnZera" type="button">Limpar</button>
+    <button class="btn btnOcultar" id="btnOcultar" type="button" aria-pressed="false" title="esconde a tabela e as chances enquanto você simula, para não ver o resultado antes da hora">Esconder a tabela</button>
     <button class="btn" id="btnLink" type="button">Copiar link desta simulação</button>
     <span class="copiado" id="copiado" hidden>Link copiado</span>
     <input class="link-box" id="linkBox" readonly aria-label="Link desta simulação">
@@ -281,6 +287,7 @@ html.modo-video .abas{display:none}
     <section class="sim-res" id="resultado" aria-labelledby="tRes" aria-live="polite">
       <h2 id="tRes" style="margin:0 0 2px">Como termina</h2>
       <p class="h2sub" style="margin:0">A tabela vai somando os resultados que você escolhe. À direita, como termina em <span id="mN"></span> cenários, com a diferença para o painel ao lado (em pontos percentuais, quando passa de 1).</p>
+      <div class="sem-spoiler" id="semSpoiler"><p>A tabela está escondida para não dar spoiler. Simule os jogos à vontade: ela continua sendo calculada e aparece quando você quiser.</p><button class="btn pri" id="btnMostrar" type="button">Mostrar a tabela</button></div>
       <div class="g-cards" id="gCards"></div>
       <div class="tabela-wrap"><table class="ranking" id="tabSim"></table></div>
       <p class="nota" style="margin-top:6px"><b>P</b>, <b>J</b>, <b>V</b>, <b>E</b>, <b>D</b>, <b>GP</b>, <b>GC</b>, <b>SG</b>: a tabela de hoje mais os jogos que você escolheu (em roxo, os pontos que mudaram); jogo escolhido sem placar conta nos pontos, mas não nos gols. Desempate: pontos, vitórias, saldo, gols pró. <b>Fim</b>: pontos no fim do campeonato (média dos cenários; embaixo, o mínimo e o máximo) · <b>Lib.</b>: chance de Libertadores (grupos + pré) · <b>Cai</b>: chance de terminar entre o 17º e o 20º. Faixa lilás: os quatro últimos da tabela. No celular, E, D, GP e GC ficam ocultos.</p>
@@ -643,9 +650,20 @@ document.getElementById("btnLink").onclick = async () => {
   try { await navigator.clipboard.writeText(url); ok.hidden = false; setTimeout(() => ok.hidden = true, 2500); box.classList.remove("on"); }
   catch (e) { box.value = url; box.classList.add("on"); box.focus(); box.select(); }
 };
-document.getElementById("irRes").onclick = () => document.getElementById("resultado").scrollIntoView({behavior: "smooth"});
+/* esconder a tabela (sugestão de seguidor: simular sem spoiler). A escolha fica guardada só neste navegador. */
+const RES = document.getElementById("resultado"), BOC = document.getElementById("btnOcultar"), IRR = document.getElementById("irRes");
+function ocultar(sim) {
+  RES.classList.toggle("oculto", sim); BOC.setAttribute("aria-pressed", sim ? "true" : "false");
+  BOC.textContent = sim ? "Mostrar a tabela" : "Esconder a tabela";
+  IRR.textContent = sim ? "Mostrar a tabela ↓" : "Ver a tabela ↓";
+  try { localStorage.setItem("simSemSpoiler", sim ? "1" : "0"); } catch (e) {}
+}
+BOC.onclick = () => ocultar(!RES.classList.contains("oculto"));
+document.getElementById("btnMostrar").onclick = () => ocultar(false);
+try { if (localStorage.getItem("simSemSpoiler") === "1") ocultar(true); } catch (e) {}
+IRR.onclick = () => { if (RES.classList.contains("oculto")) ocultar(false); RES.scrollIntoView({behavior: "smooth"}); };
 /* o botão "Ver resultado" só aparece quando a tabela do resultado está fora da tela */
-try { new IntersectionObserver(([e]) => { document.getElementById("irRes").style.visibility = e.isIntersecting ? "hidden" : "visible"; }).observe(document.getElementById("tabSim")); } catch (e) {}
+try { new IntersectionObserver(([e]) => { document.getElementById("irRes").style.visibility = e.isIntersecting ? "hidden" : "visible"; }).observe(document.getElementById("resultado")); } catch (e) {}
 leHash(); desenhaFinais(); desenhaJogos(); muda();
 </script>
 </body>
