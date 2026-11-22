@@ -384,7 +384,7 @@ html.modo-video .abas{display:none}
 
   <section class="bloco">
     <h2>Qual será o tamanho do G?</h2>
-    <p class="h2sub">Cada título de quem já está classificado, e cada vaga de rebaixado, passa uma vaga para a tabela. Os três jogos que mudam a conta, e o G em cada combinação.</p>
+    <p class="h2sub">Cada título de quem já está classificado, e cada vaga de rebaixado, passa uma vaga para a tabela. <span id="premTxt">Os três jogos que mudam a conta, e o G em cada combinação.</span></p>
     <div class="prem" id="premissas"></div>
     <div class="cen" id="cenarios" style="margin-top:18px"></div>
     <div class="leg"><span><i class="g6"></i>G6</span><span><i class="g7"></i>G7</span><span><i class="g8"></i>G8</span><span class="lg9"><i class="g9"></i>G9</span></div>
@@ -654,9 +654,13 @@ const gtxt = d => { const s = el("span"); ["6", "7", "8", "9"].filter(g => d[g] 
 const premissa = (c, tit, quando, chance, chave, sim, nao, txtDec) => el("div", {class: "prem-c"}, el("h3", {}, escudo(c), tit), el("p", {}, quando + (chance >= 1 || chance <= 0 ? " · decidido: " + (txtDec || (chance >= 1 ? "sim" : "não")) : " · chance: " + pc(100 * chance))),
   ...(chance > 0 && GP[chave]["True"] ? [el("div", {class: "lin"}, el("b", {class: "g"}, sim), gtxt(GP[chave]["True"]))] : []),
   ...(chance < 1 && GP[chave]["False"] ? [el("div", {class: "lin"}, el("b", {class: "g"}, nao), gtxt(GP[chave]["False"]))] : []));
+{ const abertaSula = PR.sula_atletico > 0 && PR.sula_atletico < 1, abertaLib = PR.lib_palmeiras > 0 && PR.lib_palmeiras < 1;
+  const oque = [abertaSula && "a final da Sul-Americana", abertaLib && "a final da Libertadores", "o rebaixamento do Grêmio"].filter(Boolean);
+  document.getElementById("premTxt").textContent = `O que ainda muda a conta: ${oque.join(", ").replace(/, ([^,]+)$/, " e $1")}. Abaixo, o G em cada combinação.`;
+  document.getElementById("premissas").style.gridTemplateColumns = window.matchMedia("(max-width:760px)").matches ? "" : `repeat(${oque.length},minmax(0,1fr))`; }
 document.getElementById("premissas").replaceChildren(
-  premissa("Atlético-MG", "Atlético-MG campeão da Sula", "x Boca Juniors, 21/11, Barranquilla", PR.sula_atletico, "galo_sula", "Campeão", "Vice", PR.sula_atletico <= 0 ? "Boca Juniors campeão" : "Atlético-MG campeão"),
-  premissa("Palmeiras", "Palmeiras campeão da Libertadores", "x Estudiantes, 28/11, Montevidéu", PR.lib_palmeiras, "palmeiras_lib", "Campeão", "Vice"),
+  ...(PR.sula_atletico > 0 && PR.sula_atletico < 1 ? [premissa("Atlético-MG", "Atlético-MG campeão da Sula", "x Boca Juniors, 21/11, Barranquilla", PR.sula_atletico, "galo_sula", "Campeão", "Vice")] : []),
+  ...(PR.lib_palmeiras > 0 && PR.lib_palmeiras < 1 ? [premissa("Palmeiras", "Palmeiras campeão da Libertadores", "x Estudiantes, 28/11, Montevidéu", PR.lib_palmeiras, "palmeiras_lib", "Campeão", "Vice")] : []),
   premissa("Grêmio", "Grêmio rebaixado", "simulação do rebaixamento", (DADOS.clubes.find(r => r.clube === "Grêmio").cai) / 100, "gremio_cai", "Cai", "Fica"));
 const SULA_ABERTA = PR.sula_atletico > 0 && PR.sula_atletico < 1;
 if (!SULA_ABERTA) document.getElementById("cenarios").classList.add("sem-sula");
