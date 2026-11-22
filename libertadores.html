@@ -602,7 +602,7 @@ function evolucao(id, linhas, valor, rotLinha, tip, certoUlt) {
   evolucao("tabEvo", L, (e, c) => e.lib[c], r => clube(r.clube), (e, c) => `grupos ${pc(e.grupos[c] ?? 0)} · pré ${pc(e.pre[c] ?? 0)}`,
     c => CGx[c] && CGx[c].garantido ? certo("Libertadores garantida pela matemática") : null);
   // tamanho exato do G em cada coluna; o G6 é o mínimo garantido, então a linha dele é "só G6"
-  evolucao("tabEvoG", ["6", "7", "8", "9"].map(g => ({clube: g, P: ""})), (e, g) => e.tamanho_g[g] || 0, r => el("b", {}, (r.clube === "6" ? "Só G" : "G") + r.clube)); }
+  evolucao("tabEvoG", GS.map(g => ({clube: g, P: ""})), (e, g) => e.tamanho_g[g] || 0, r => el("b", {}, (r.clube === "6" ? "Só G" : "G") + r.clube)); }
 
 /* chance */
 const CL = DADOS.clubes.filter(r => r.lib >= 0.5).sort((a, b) => b.lib - a.lib);
