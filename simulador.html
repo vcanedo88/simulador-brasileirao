@@ -563,10 +563,15 @@ function caiuCerto(r, rows) {
 const REF = DADOS.ref;
 const delta = (v, ref, inverte) => { const d = v - ref; if (Math.abs(d) < 1) return null;
   return el("span", {class: "dlt" + ((d > 0) !== !!inverte ? " sobe" : ""), title: "painel: " + pc(ref)}, (d > 0 ? "▲" : "▼") + Math.round(Math.abs(d))); };
+/* uma casa decimal com soma fechando em 100,0% (maior resto): os valores exatos não somam 100 depois de arredondados um a um */
+const fecha100 = obj => { const ks = Object.keys(obj).filter(k => obj[k] > 0), dec = ks.map(k => obj[k] * 10), base = dec.map(Math.floor);
+  let falta = Math.round(ks.reduce((a, k) => a + obj[k], 0) * 10) - base.reduce((a, b) => a + b, 0);
+  [...ks.keys()].sort((i, j) => (dec[j] - base[j]) - (dec[i] - base[i])).forEach(i => { if (falta > 0) { base[i]++; falta--; } });
+  const r = Object.fromEntries(Object.keys(obj).map(k => [k, "0,0%"])); ks.forEach((k, i) => r[k] = (base[i] / 10).toFixed(1).replace(".", ",") + "%"); return r; };
 function desenhaResultado(R) {
-  const T = R.tamanho, mx = Math.max(...Object.values(T));
+  const T = R.tamanho, mx = Math.max(...Object.values(T)), T1 = fecha100(T);
   document.getElementById("gCards").replaceChildren(...[6, 7, 8, 9].filter(g => g < 9 || DADOS.finais.sula.prob > 0).map(g => el("div", {class: "g-card" + (T[g] === mx ? " top" : "")},
-    el("span", {class: "r"}, g === 6 ? "Só G6" : "G" + g), el("b", {}, pc(T[g])), delta(T[g], DADOS.ref_tamanho[g] || 0))));
+    el("span", {class: "r"}, g === 6 ? "Só G6" : "G" + g), el("b", {}, T1[g]), delta(T[g], DADOS.ref_tamanho[g] || 0))));
   const FIM = Object.fromEntries(R.clubes.map(r => [r.clube, r]));
   const HOJE = Object.fromEntries(DADOS.tabela.map(r => [r.clube, r]));
   const rows = tabelaCarregada();
