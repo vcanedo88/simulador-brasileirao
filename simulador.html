@@ -273,9 +273,9 @@ html.modo-video .abas{display:none}
 
   <div class="sim-grade">
     <section class="sim-jogos" aria-labelledby="tJogos">
-      <div class="finais">
-        <h2 style="margin:0 0 2px">As finais</h2>
-        <p class="h2sub" style="margin:0 0 4px">Mudam o tamanho do G. A final da Copa do Brasil não entra: Palmeiras e Grêmio já vão à Libertadores por ela, e a vaga do Grêmio só volta à tabela se ele cair. Em <b>Modelo</b>, o campeão é sorteado em cada cenário com as chances do mercado (as porcentagens). Clique num clube para fixá-lo campeão.</p>
+      <div class="finais" id="blocoFinais">
+        <h2 style="margin:0 0 2px" id="tFinais">As finais</h2>
+        <p class="h2sub" style="margin:0 0 4px"><span id="mudaG">Mudam o tamanho do G.</span> A final da Copa do Brasil não entra: Palmeiras e Grêmio já vão à Libertadores por ela, e a vaga do Grêmio só volta à tabela se ele cair. Em <b>Modelo</b>, o campeão é sorteado em cada cenário com as chances do mercado (as porcentagens). Clique num clube para fixá-lo campeão.</p>
         <div id="finais"></div>
       </div>
       <h2 id="tJogos" style="margin:0 0 2px">Os jogos que faltam</h2>
@@ -297,7 +297,7 @@ html.modo-video .abas{display:none}
 
   <section class="bloco" id="como">
     <h2>Como funciona</h2>
-    <p class="h2sub" style="max-width:860px">É a mesma conta dos painéis do rebaixamento e da Libertadores, feita no seu navegador. A cada mudança, os jogos que ficaram em Modelo são sorteados <span id="mN2"></span> vezes com as chances do índice do canal; os que você escolheu ficam fixos. Sem placar, o saldo de gols de quem vence é sorteado (1 gol em 60% das vezes, 2 em 28%, 3 em 12%). No botão Sortear, o placar de cada jogo vem do xG sem pênaltis da temporada (FotMob/Opta): a média de gols de cada lado é o ataque de um vezes a defesa do outro, com o mando da liga, ajustada para a média real de gols; o placar é sorteado até bater com o resultado que o modelo sorteou. Desempate: pontos, vitórias, saldo e sorteio (gols pró não entram). Finais: <span id="mFin"></span>. Vagas: G4 na fase de grupos e o 5º na pré; campeões da Libertadores, da Sul-Americana e da Copa do Brasil vão aos grupos e o vice da Copa vai à pré; vaga de quem já está classificado ou caiu passa para a tabela. Rebaixados: do 17º ao 20º. Sem nenhuma escolha, os números ficam a até 1 ponto dos do painel: é a variação natural do sorteio.</p>
+    <p class="h2sub" style="max-width:860px">É a mesma conta dos painéis do rebaixamento e da Libertadores, feita no seu navegador. A cada mudança, os jogos que ficaram em Modelo são sorteados <span id="mN2"></span> vezes com as chances do índice do canal; os que você escolheu ficam fixos. Sem placar, o saldo de gols de quem vence é sorteado (1 gol em 60% das vezes, 2 em 28%, 3 em 12%). No botão Sortear, o placar de cada jogo vem do xG sem pênaltis da temporada (FotMob/Opta): a média de gols de cada lado é o ataque de um vezes a defesa do outro, com o mando da liga, ajustada para a média real de gols; o placar é sorteado até bater com o resultado que o modelo sorteou. Desempate: pontos, vitórias, saldo e sorteio (gols pró não entram). Finais: <span id="mFin"></span>. Vagas: G4 na fase de grupos e o 5º na pré; campeões da Libertadores<span id="mSulaV">, da Sul-Americana</span> e da Copa do Brasil vão aos grupos e o vice da Copa vai à pré; vaga de quem já está classificado ou caiu passa para a tabela. Rebaixados: do 17º ao 20º. Sem nenhuma escolha, os números ficam a até 1 ponto dos do painel: é a variação natural do sorteio.</p>
   </section>
 
   <footer class="rodape">
@@ -432,13 +432,21 @@ function gravaHash() {
 }
 
 /* finais */
+/* só as finais que ainda não foram jogadas aparecem (pedido do Victor, 22/11: tirar a Sul-Americana depois da final) */
+const NOMEFIN = {sula: "Sul-Americana", lib: "Libertadores"}, ABERTAS = FINAIS.filter(k => DADOS.finais[k].prob > 0 && DADOS.finais[k].prob < 1);
+if (DADOS.finais.sula.prob <= 0) document.getElementById("mSulaV").remove();   // campeão estrangeiro: não mexe nas vagas
+if (!ABERTAS.length) document.getElementById("blocoFinais").remove();
+else { document.getElementById("tFinais").textContent = ABERTAS.length === 1 ? "A final" : "As finais";
+  document.getElementById("mudaG").textContent = ABERTAS.length === 1 ? "Muda o tamanho do G." : "Mudam o tamanho do G."; }
+document.querySelectorAll(".btnSort").forEach(b => b.title = "sorteia um placar para cada jogo que está no Modelo, dia a dia" +
+  (ABERTAS.length ? ", e o campeão da " + ABERTAS.map(k => NOMEFIN[k]).join(" e da ") : ""));
 function desenhaFinais() {
   const L = {sula: ["Sul-Americana", "Atlético-MG x Boca Juniors"], lib: ["Libertadores", "Palmeiras x Estudiantes"], copa: ["Copa do Brasil", "Palmeiras x Grêmio"]};
-  const box = document.getElementById("finais"); box.replaceChildren();
+  const box = document.getElementById("finais"); if (!box) return; box.replaceChildren();
   for (const k of FINAIS) {
     const F = DADOS.finais[k], dec = F.prob >= 1 || F.prob <= 0;
     const tit = el("div", {class: "tit"}, L[k][0], el("span", {}, L[k][1] + (F.quando ? ", " + F.quando : "")));
-    if (dec) { box.append(el("div", {class: "fin"}, tit, el("span", {style: "font-size:13px;font-weight:700"}, "Decidida: " + (F.prob >= 1 ? F.campeao : F.rival) + " campeão"))); continue; }
+    if (dec) continue;   // final já jogada: sai do simulador (o campeão já está na conta)
     const seg = el("div", {class: "seg", role: "group", "aria-label": "Final da " + L[k][0]});
     const nomeR = F.rival;
     const pa = Math.round(100 * F.prob);   // os dois lados somam 100
