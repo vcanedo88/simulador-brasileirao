@@ -371,7 +371,7 @@ function chips(id, tipo, lista) {
     box.append(ch);
   });
 }
-chips("chZ4", "z4", DADOS.z4);
+chips("chZ4", "z4", [...DADOS.z4].sort((a, b) => a.chance - b.chance));  // da maior chance de escapar à maior de cair (pedido do Victor, 23/11)
 chips("chLib", "lib", DADOS.lib);
 { const h = new URLSearchParams(location.hash.slice(1)).get("c");
   const z = DADOS.z4.find(x => x.clube === h), l = DADOS.lib.find(x => x.clube === h);
