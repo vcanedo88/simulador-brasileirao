@@ -160,10 +160,10 @@ table.cen{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
 .res{display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;font-weight:700;font-size:13px}
 .res.V{background:var(--roxo);color:#fff}.res.E{background:var(--s2);color:var(--texto)}.res.D{background:#fff;border:1px solid var(--cinza);color:var(--texto-2);line-height:24px}
 .cen td.mat{font-size:13px;line-height:1.4}
-.tag{display:inline-block;font-weight:700;font-size:12px;padding:2px 7px;margin-bottom:3px}
+.tag{display:inline-block;font-weight:700;font-size:12px;padding:2px 7px;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em}
 .tag.bom{background:var(--roxo);color:#fff}.tag.ruim{background:var(--texto);color:#fff}.tag.dep{background:var(--s1);color:var(--roxo)}
 .cond{margin:2px 0 0;padding:0;list-style:none}
-.cond li{margin:1px 0}
+.cond li{margin:4px 0}
 .cond li{display:flex;flex-wrap:wrap;align-items:center;gap:4px 5px}
 .cond li img{width:26px;height:26px;object-fit:contain;flex:none}
 .cond .vb{white-space:nowrap}
@@ -173,7 +173,7 @@ table.cen{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
 .rot{font-weight:700;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--texto);margin-bottom:4px}
 .cond .ou{display:block;font-weight:700;font-size:12px;letter-spacing:.06em;color:var(--roxo);margin:4px 0 1px}
 .cond li.alt{display:block}
-.emp{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:5px;font-size:12px;color:var(--texto-2)}
+.emp{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:12px;font-size:12px;color:var(--texto-2)}
 .emp span.cl{display:inline-flex;align-items:center;gap:3px;color:var(--texto);font-weight:600}
 .emp img{width:22px;height:22px;object-fit:contain}
 .cen td.pts{font-size:20px;font-weight:700}
@@ -181,15 +181,15 @@ table.cen{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
 .cond .pq{color:var(--texto-2);font-size:12px;white-space:nowrap}
 .sub2{font-size:12px;color:var(--texto-2)}
 tr.raro td{color:var(--texto-2)}
-.cen .chance b{font-size:15px}
+.cen .chance b{font-size:20px;font-weight:700}
 .legenda{font-size:12px;color:var(--texto-2);margin-top:8px}
 @media (max-width:640px){.cab{flex-wrap:wrap}.cab .grande{margin-left:0;text-align:left;flex-basis:100%}.cab .grande b{display:inline;margin-right:6px}.cab h2{font-size:21px}.cab .grande b{font-size:26px}.cen{font-size:13px}.cen td.mat{font-size:12px}.cen td,.cen th{padding:6px 3px}.res{width:22px;height:22px;line-height:22px;font-size:12px}.res.D{line-height:20px}}
-.saldoTxt{margin-top:3px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:12px;color:var(--texto-2)}
+.saldoTxt{margin-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:12px;color:var(--texto-2)}
 .saldoTxt .it{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.saldoTxt b{color:var(--texto)}.saldoTxt img,.soSai img{width:20px;height:20px;object-fit:contain;vertical-align:-5px}
 #card{margin-top:36px}
 .cen tr.sem-borda td{border-bottom:none;padding-bottom:2px}.cen tr.linha-mat td.mat{padding-top:2px}
 @media (max-width:640px){.cen .tag{white-space:normal;display:inline-block}}
-.soSai{margin-top:8px;padding:6px 8px;border-left:3px solid var(--roxo,#400078);background:rgba(64,0,120,.05);font-size:13px;line-height:1.45}
+.soSai{margin-top:12px;padding:6px 8px;border-left:3px solid var(--roxo,#400078);background:rgba(64,0,120,.05);font-size:13px;line-height:1.45}
 .tabcl-box{margin-top:14px}.tabcl-box summary{font:700 13px var(--sans,Poppins,sans-serif);text-transform:uppercase;letter-spacing:.05em;color:var(--texto-2);cursor:pointer;margin-bottom:6px}
 table.tabcl{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
 .tabcl th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--texto-2);text-align:right;padding:6px 6px;border-bottom:2px solid var(--texto)}
@@ -357,7 +357,7 @@ function saldoTxt(c, b, emp) {
     const gap = b.SG - x.sg;
     if (!gap) { d.append(el("span", {class: "it", title: "mesmo saldo hoje"}, escudo(c), "=", escudo(x.clube))); return; }
     const atras = gap > 0 ? x.clube : c, frente = gap > 0 ? c : x.clube;
-    d.append(el("span", {class: "it", title: `${atras} precisa tirar ${Math.abs(gap) + 1} gols de saldo de ${frente}; com ${Math.abs(gap)}, decide nos gols pró`}, escudo(atras), el("b", {}, String(Math.abs(gap) + 1)), "de", escudo(frente)));
+    d.append(el("span", {class: "it", title: `${atras} precisa tirar ${Math.abs(gap) + 1} gols de saldo de ${frente}; com ${Math.abs(gap)}, decide nos gols pró`}, escudo(atras), el("b", {}, String(Math.abs(gap) + 1)), art(frente) === "a" ? "da" : "do", escudo(frente)));
   });
   return d;
 }
