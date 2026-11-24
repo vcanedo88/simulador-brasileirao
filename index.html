@@ -531,7 +531,7 @@ function evolucao(id, linhas, valor, rotLinha, tip) {
   t.replaceChildren(el("thead", {}, tr), tb);
 }
 
-{ const TBE = DADOS.tabela.filter(r => r.rebaixado || (r.pode_cair && r.cai > 0)).sort((a, b) => (b.cai ?? 100) - (a.cai ?? 100));
+{ const TBE = DADOS.tabela.filter(r => r.rebaixado || (r.pode_cair && r.cai > 0)).sort((a, b) => (a.cai ?? 100) - (b.cai ?? 100));   // menor chance de cair no alto, como no resto do painel (pedido do Victor, 23/11)
   evolucao("tabEvo", TBE.filter(r => !r.rebaixado), (e, c) => e.cai[c], r => clube(r.clube)); }
 
 /* chance */
