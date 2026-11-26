@@ -271,6 +271,10 @@ html.modo-video .video-nav:hover{opacity:1}
 #tabJogos.alinhada th:nth-child(1){width:var(--c1)}#tabJogos.alinhada th:nth-child(2){width:var(--c2)}#tabJogos.alinhada th:nth-child(3){width:var(--c3)}#tabJogos.alinhada th:nth-child(4){width:var(--c4)}#tabJogos.alinhada th:nth-child(5){width:var(--c5)}#tabJogos.alinhada th:nth-child(-n+4),#tabJogos.alinhada td:nth-child(-n+4){padding-left:1px;padding-right:1px;overflow:hidden;text-overflow:clip}
 @media (max-width:700px){#tabJogos .adv img{width:18px;height:18px}#tabJogos th:nth-child(-n+4){font-size:9px;letter-spacing:0}#tabJogos td:nth-child(2){font-size:11px}#tabJogos .dif{min-width:24px;padding:1px 2px}}
 .kpis .kpi b.kpi-num{display:flex;align-items:center;gap:3px}.seta-queda{display:inline-flex;line-height:0;opacity:.75}.seta-queda svg{width:16px;height:16px}@media (max-width:640px){.seta-queda svg{width:13px;height:13px}}
+.kpis{grid-template-columns:repeat(var(--nk,4),minmax(0,1fr))}
+.kpis .kpi b{font-size:clamp(24px,2.7vw,36px)}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:480px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <style>
 .abas{display:flex;gap:4px;margin:0 0 18px;border-bottom:1px solid var(--cinza,#E3E3E3)}
@@ -425,7 +429,9 @@ const CLUBES = DADOS.clubes.filter(r => r.no_indice !== false);
 // destaque (roxo): só as vagas de queda que ainda estão em jogo (4 menos quem já está praticamente rebaixado, ≥ 99,5%),
 // preenchidas pelos que têm mais chance de cair hoje; os cartões do topo seguem com os quatro mais ameaçados
 const VAGAS = Math.max(0, 4 - DADOS.tabela.filter(r => r.cai >= 99.5).length);
-const AMEACA4 = [...CLUBES].sort((a, b) => b.chance_cair - a.chance_cair).slice(0, 4).map(r => r.clube);
+// destaques: todos os que ainda podem cair (e não caíram), do mais ameaçado ao menos; até 6
+const _PODE = new Set(DADOS.tabela.filter(r => r.pode_cair && !r.rebaixado && r.cai > 0).map(r => r.clube));
+const AMEACA4 = [...CLUBES].filter(r => _PODE.has(r.clube)).sort((a, b) => b.chance_cair - a.chance_cair).slice(0, 6).map(r => r.clube);
 const FOCO = AMEACA4.slice(0, VAGAS);
 const ESC_NOME = n => n;
 const NOME = n => n;
@@ -490,6 +496,7 @@ const TV = Object.fromEntries(DADOS.tabela.map(r => [r.clube, r]));   // vitóri
 /* seta para baixo ao lado do % (chance de queda), pedido do Victor em 26/11 */
 const setaQueda = () => { const s = el("span", {class: "seta-queda", title: "chance de cair", "aria-label": "chance de cair"});
   s.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 6 6-6" fill="none" stroke="#C62828" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'; return s; };
+document.getElementById("kpis").style.setProperty("--nk", AMEACA4.length);
 document.getElementById("kpis").replaceChildren(...AMEACA4.map((c, i) => {
   const r = C[c];
   return el("div", {class: "kpi" + (FOCO.includes(c) ? " destaque" : "")}, el("div", {class: "kpi-esc"}, escudo(c), el("strong", {}, NOME(c))),
