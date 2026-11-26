@@ -296,7 +296,7 @@ html.modo-video .abas{display:none}
   <div class="kpis" id="kpis"></div>
 
   <section class="bloco" style="margin-top:6px">
-    <h2>A tabela de quem ainda pode cair matematicamente</h2>
+    <h2 id="titTab">A tabela de quem ainda pode cair matematicamente</h2>
     <p class="h2sub">Clubes que a matemática ainda permite rebaixar e que caíram em pelo menos um dos 50 mil cenários. <span id="mTabela"></span></p>
     <div class="tabela-wrap"><table class="ranking" id="tabAmeaca"></table></div>
     <p class="nota"><b>P</b>: pontos · <b>J</b>: jogos · <b>V</b>, <b>E</b>, <b>D</b>: vitórias, empates e derrotas · <b>GP</b> e <b>GC</b>: gols pró e contra · <b>SG</b>: saldo · <b>%</b>: aproveitamento · <b>Máx.</b>: pontos se vencer todos os jogos que faltam · <b>Cai</b>: chance de cair na simulação. Desempate: vitórias, saldo, gols pró. No celular, E, D, GP e GC ficam ocultos.</p>
@@ -498,6 +498,9 @@ document.getElementById("kpis").replaceChildren(...AMEACA4.map((c, i) => {
 
 /* tabela de quem ainda pode cair */
 { const TB = DADOS.tabela.filter(r => r.rebaixado || (r.pode_cair && r.cai > 0));
+  { const EXT = ["zero", "uma", "duas", "três", "quatro"], EXTM = ["zero", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove", "dez"];
+    const n = TB.filter(r => !r.rebaixado).length, cap = t => t[0].toUpperCase() + t.slice(1);   // título com as vagas que sobram e quem disputa
+    if (VAGAS > 0 && n > VAGAS) document.getElementById("titTab").textContent = `${cap(EXT[VAGAS] || String(VAGAS))} ${VAGAS === 1 ? "vaga" : "vagas"} para ${EXTM[n] || n} times`; }
   const sinal = v => v > 0 ? "+" + v : v < 0 ? "−" + Math.abs(v) : "0";
   document.getElementById("mTabela").textContent = TB.length + " clubes, do " + TB[0].pos + "º ao 20º.";
   tabela("tabAmeaca", TB, [
