@@ -270,6 +270,7 @@ html.modo-video .video-nav:hover{opacity:1}
 #tabJogos.alinhada{table-layout:fixed}#tabJogos.alinhada th{box-sizing:border-box}
 #tabJogos.alinhada th:nth-child(1){width:var(--c1)}#tabJogos.alinhada th:nth-child(2){width:var(--c2)}#tabJogos.alinhada th:nth-child(3){width:var(--c3)}#tabJogos.alinhada th:nth-child(4){width:var(--c4)}#tabJogos.alinhada th:nth-child(5){width:var(--c5)}#tabJogos.alinhada th:nth-child(-n+4),#tabJogos.alinhada td:nth-child(-n+4){padding-left:1px;padding-right:1px;overflow:hidden;text-overflow:clip}
 @media (max-width:700px){#tabJogos .adv img{width:18px;height:18px}#tabJogos th:nth-child(-n+4){font-size:9px;letter-spacing:0}#tabJogos td:nth-child(2){font-size:11px}#tabJogos .dif{min-width:24px;padding:1px 2px}}
+.kpis .kpi b.kpi-num{display:flex;align-items:center;gap:8px}.seta-queda{display:inline-flex;line-height:0}.seta-queda svg{width:26px;height:26px}@media (max-width:640px){.seta-queda svg{width:20px;height:20px}}
 </style>
 <style>
 .abas{display:flex;gap:4px;margin:0 0 18px;border-bottom:1px solid var(--cinza,#E3E3E3)}
@@ -486,10 +487,13 @@ document.getElementById("logoCamp").replaceChildren(el("img", {class: "logo-camp
 for (const id of ["assinatura", "assinatura2"]) { const s = document.getElementById(id); if (s) s.replaceChildren(el("img", {src: SIMBOLO, alt: "Canedo", style: "height:40px"})); }
 const C = Object.fromEntries(CLUBES.map(r => [r.clube, r]));
 const TV = Object.fromEntries(DADOS.tabela.map(r => [r.clube, r]));   // vitórias e saldo nos destaques: com tantos empatados em pontos, o desempate já conta
+/* seta para baixo ao lado do % (chance de queda), pedido do Victor em 26/11 */
+const setaQueda = () => { const s = el("span", {class: "seta-queda", title: "chance de cair", "aria-label": "chance de cair"});
+  s.innerHTML = '<svg viewBox="0 0 24 24" width="26" height="26"><circle cx="12" cy="12" r="11" fill="#C62828"/><path d="M12 6v11M7 12.5l5 5 5-5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'; return s; };
 document.getElementById("kpis").replaceChildren(...AMEACA4.map((c, i) => {
   const r = C[c];
   return el("div", {class: "kpi" + (FOCO.includes(c) ? " destaque" : "")}, el("div", {class: "kpi-esc"}, escudo(c), el("strong", {}, NOME(c))),
-    el("b", {}, pc(r.chance_cair)), el("span", {}, `${r.posicao}º · ${r.pontos} pts` + (TV[c] ? ` · ${TV[c].V}V · SG ${TV[c].SG > 0 ? "+" : ""}${TV[c].SG}` : "")));
+    el("b", {class: "kpi-num"}, pc(r.chance_cair), setaQueda()), el("span", {}, `${r.posicao}º · ${r.pontos} pts` + (TV[c] ? ` · ${TV[c].V}V · SG ${TV[c].SG > 0 ? "+" : ""}${TV[c].SG}` : "")));
 }));
 
 /* tabela de quem ainda pode cair */
