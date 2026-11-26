@@ -224,10 +224,17 @@ table.ranking{min-width:0;width:100%}
 @media (max-width:1150px){#tabSim .gpgc{display:none}}
 @media (max-width:520px){#tabSim .md{display:none}#tabSim .cl .nm{display:none}#tabSim{font-size:12.5px}}
 #tabSim td.n,#tabSim th.n{text-align:right}
-#tabSim tr.z4 td{background:var(--s1)}
+#tabSim tr.z4 td{background:#FBEDED}
+#tabSim tr.g4 td{background:var(--s1)}
+#tabSim th.lib,#tabSim td.lib{border-left:2px solid var(--texto)}
+#tabSim td.n:first-child{font-weight:700;color:var(--texto-2)}
+#tabSim .zero{color:#B5B5B5}
+#tabSim .ok-v svg{width:17px;height:17px;vertical-align:-3px}
+#tabSim .caiu{color:#C62828;font-weight:700}
+#tabSim tr.corte td{border-bottom:2px solid #C62828!important}
 #tabSim tr.corte td{border-bottom:2px solid var(--roxo)}
 #tabSim .cl{display:flex;align-items:center;gap:7px;font-weight:500;white-space:nowrap}
-#tabSim .cl img{width:20px;height:20px;object-fit:contain}
+#tabSim .cl img{width:24px;height:24px;object-fit:contain}
 #tabSim .forte{font-weight:700;color:var(--roxo)}
 #tabSim .pts-f{color:var(--texto-2);font-size:11px;display:block;line-height:1;font-weight:400}
 .calc{font-size:12px;color:var(--texto-2);min-height:16px}
@@ -239,6 +246,11 @@ table.ranking{min-width:0;width:100%}
 .ir-res{display:none}
 @media (max-width:900px){.ir-res{display:block;position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;font:700 13px var(--sans);padding:9px 14px;background:var(--roxo);color:#fff;border:0;box-shadow:0 2px 8px rgba(0,0,0,.25)}}
 @media (max-width:420px){.seg button{padding:5px 6px;font-size:12px;gap:3px}.seg button img{width:16px;height:16px}.tm{font-size:13px}#tabSim{font-size:13px}.g-card b{font-size:20px}}
+.img-modal{position:fixed;inset:0;background:rgba(20,20,20,.72);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.img-modal .box{background:#fff;max-width:min(92vw,520px);max-height:92vh;display:flex;flex-direction:column;gap:10px;padding:14px}
+.img-modal img{max-width:100%;max-height:70vh;object-fit:contain;border:1px solid var(--cinza)}
+.img-modal .acoes{display:flex;gap:8px;flex-wrap:wrap}
+.img-modal p{margin:0;font-size:12.5px;color:var(--texto-2)}
 </style>
 <style>
 .abas{display:flex;gap:4px;margin:0 0 18px;border-bottom:1px solid var(--cinza,#E3E3E3)}
@@ -267,6 +279,8 @@ html.modo-video .abas{display:none}
     <button class="btn btnZera" id="btnZera" type="button">Limpar</button>
     <button class="btn btnOcultar" id="btnOcultar" type="button" aria-pressed="false" title="esconde a tabela e as chances enquanto você simula, para não ver o resultado antes da hora">Esconder a tabela</button>
     <button class="btn" id="btnLink" type="button">Copiar link desta simulação</button>
+    <button class="btn" id="btnStory" type="button" title="imagem 1080 x 1920 com a tabela desta simulação">Imagem para story</button>
+    <button class="btn" id="btnFeed" type="button" title="imagem 1080 x 1350 com a tabela desta simulação">Imagem para feed</button>
     <span class="copiado" id="copiado" hidden>Link copiado</span>
     <input class="link-box" id="linkBox" readonly aria-label="Link desta simulação">
   </div>
@@ -275,29 +289,29 @@ html.modo-video .abas{display:none}
     <section class="sim-jogos" aria-labelledby="tJogos">
       <div class="finais" id="blocoFinais">
         <h2 style="margin:0 0 2px" id="tFinais">As finais</h2>
-        <p class="h2sub" style="margin:0 0 4px"><span id="mudaG">Mudam o tamanho do G.</span> A final da Copa do Brasil não entra: Palmeiras e Grêmio já vão à Libertadores por ela, e a vaga do Grêmio só volta à tabela se ele cair. Em <b>Modelo</b>, o campeão é sorteado em cada cenário com as chances do mercado (as porcentagens). Clique num clube para fixá-lo campeão.</p>
+        <p class="h2sub" style="margin:0 0 4px">Se o Palmeiras for campeão, o Brasileirão será ao menos G7. Em <b>Modelo</b>, o campeão é sorteado em cada cenário com as chances do mercado. Clique num clube para fixá-lo campeão.</p>
         <div id="finais"></div>
       </div>
       <h2 id="tJogos" style="margin:0 0 2px">Os jogos que faltam</h2>
-      <p class="h2sub" style="margin:0 0 10px">Todo jogo começa em <b>Modelo</b>: ele fica em aberto e, a cada mudança, o simulador joga a reta final <span class="mN3"></span> vezes com as chances do modelo (as porcentagens dos botões; a barrinha lilás mostra o peso de cada uma). É isso que dá as chances de <b>Como termina</b>. Para fixar um jogo, clique no resultado ou digite o placar (o placar entra no saldo). Para ver uma temporada possível inteira, use <b>Sortear</b>: ele sorteia cada jogo em aberto, dia a dia, na ordem do calendário, e a tabela vai andando. O resultado sai das chances do modelo; o placar, do xG da temporada (o ataque de um contra a defesa do outro, com o mando de campo). Clique de novo para outra temporada; <b>Limpar</b> volta tudo ao Modelo.</p>
+      <p class="h2sub" style="margin:0 0 10px">Todo jogo começa em <b>Modelo</b>: ele fica em aberto e, a cada mudança, o simulador joga a reta final <span class="mN3"></span> vezes com as chances do modelo. Para fixar um jogo, clique no resultado ou digite o placar, que entra no saldo. Clique em <b>Sortear</b> para simular na ordem do calendário.</p>
       <div class="filtro"><span id="rotF">Mostrar jogos de</span><div class="sel-esc" id="selF"></div><button class="btn pri btnSort" id="btnSort2" type="button" title="sorteia um placar para cada jogo que está no Modelo, dia a dia, e o campeão da Sul-Americana e da Libertadores">Sortear</button><button class="btn btnZera" id="btnZera2" type="button">Limpar</button></div>
       <div id="jogos"></div>
     </section>
 
     <section class="sim-res" id="resultado" aria-labelledby="tRes" aria-live="polite">
       <h2 id="tRes" style="margin:0 0 2px">Como termina</h2>
-      <p class="h2sub" style="margin:0">A tabela vai somando os resultados que você escolhe. À direita, como termina em <span id="mN"></span> cenários, com a diferença para o painel ao lado (em pontos percentuais, quando passa de 1).</p>
+      <p class="h2sub" style="margin:0">A tabela soma os resultados que você escolhe; as chances saem de <span id="mN"></span> cenários (ao lado, a diferença para o painel, quando passa de 1 ponto).</p>
       <div class="sem-spoiler" id="semSpoiler"><p>A tabela está escondida para não dar spoiler. Simule os jogos à vontade: ela continua sendo calculada e aparece quando você quiser.</p><button class="btn pri" id="btnMostrar" type="button">Mostrar a tabela</button></div>
       <div class="g-cards" id="gCards"></div>
       <div class="tabela-wrap"><table class="ranking" id="tabSim"></table></div>
-      <p class="nota" style="margin-top:6px"><b>P</b>, <b>J</b>, <b>V</b>, <b>E</b>, <b>D</b>, <b>GP</b>, <b>GC</b>, <b>SG</b>: a tabela de hoje mais os jogos que você escolheu (em roxo, os pontos que mudaram); jogo escolhido sem placar conta nos pontos, mas não nos gols. Desempate: pontos, vitórias, saldo, gols pró. <b>Fim</b>: pontos no fim do campeonato (média dos cenários; embaixo, o mínimo e o máximo) · <b>Lib.</b>: chance de Libertadores (grupos + pré) · <b>Cai</b>: chance de terminar entre o 17º e o 20º. Faixa lilás: os quatro últimos da tabela. No celular, E, D, GP e GC ficam ocultos.</p>
+      <p class="nota" style="margin-top:6px">A tabela de hoje mais os jogos que você escolheu (em roxo, os pontos que mudaram); sem placar, o jogo conta nos pontos, não nos gols. Desempate: pontos, vitórias, saldo, gols pró. <b>Lib.</b>: chance de Libertadores · <b>Cai</b>: chance de cair. No celular, E, D, GP e GC ficam ocultos.</p>
       <p class="calc" id="calc"></p>
     </section>
   </div>
 
   <section class="bloco" id="como">
     <h2>Como funciona</h2>
-    <p class="h2sub" style="max-width:860px">É a mesma conta dos painéis do rebaixamento e da Libertadores, feita no seu navegador. A cada mudança, os jogos que ficaram em Modelo são sorteados <span id="mN2"></span> vezes com as chances do índice do canal; os que você escolheu ficam fixos. Sem placar, o saldo de gols de quem vence é sorteado (1 gol em 60% das vezes, 2 em 28%, 3 em 12%). No botão Sortear, o placar de cada jogo vem do xG sem pênaltis da temporada (FotMob/Opta): a média de gols de cada lado é o ataque de um vezes a defesa do outro, com o mando da liga, ajustada para a média real de gols; o placar é sorteado até bater com o resultado que o modelo sorteou. Desempate: pontos, vitórias, saldo e sorteio (gols pró não entram). Finais: <span id="mFin"></span>. Vagas: G4 na fase de grupos e o 5º na pré; campeões da Libertadores<span id="mSulaV">, da Sul-Americana</span> e da Copa do Brasil vão aos grupos e o vice da Copa vai à pré; vaga de quem já está classificado ou caiu passa para a tabela. Rebaixados: do 17º ao 20º. Sem nenhuma escolha, os números ficam a até 1 ponto dos do painel: é a variação natural do sorteio.</p>
+    <p class="h2sub" style="max-width:860px">A mesma conta dos painéis, feita no seu navegador: os jogos em Modelo são sorteados <span id="mN2"></span> vezes com as chances do índice do canal; os que você escolheu ficam fixos. Sem placar, o saldo de quem vence é sorteado (1 gol em 60% das vezes, 2 em 28%, 3 em 12%). Em Sortear, o placar vem do xG sem pênaltis da temporada (FotMob/Opta), com o mando. Final da Libertadores: <span id="mFin"></span>. Vagas: G4 na fase de grupos e o 5º na pré; campeões da Libertadores e da Copa do Brasil vão aos grupos e o vice da Copa, à pré; vaga de quem já está classificado ou caiu passa para a tabela. Sem nenhuma escolha, os números ficam a até 1 ponto dos do painel: é a variação natural do sorteio.</p>
   </section>
 
   <footer class="rodape">
@@ -382,7 +396,8 @@ function simula(D, escolhas, finais, N, seed) {
 }
 
 
-const NSIM = 30000;
+let ULTIMO = null;   // último resultado (para a imagem de compartilhar)
+const NSIM = 50000;   // o mesmo número dos painéis (pedido do Victor, 26/11)
 const pc = v => v == null ? "–" : v === 100 ? "100%" : v >= 99.5 ? ">99%" : v === 0 ? "0%" : v < 0.5 ? "<1%" : Math.floor(v + 0.5) + "%";
 const num1 = v => v.toLocaleString("pt-BR", {minimumFractionDigits: 1, maximumFractionDigits: 1});
 const el = (tag, attrs = {}, ...kids) => {
@@ -400,7 +415,7 @@ document.getElementById("mRot").textContent = DADOS.meta.rodada || ("Tabela de "
 document.getElementById("nTot").textContent = DADOS.jogos.length;
 document.getElementById("mN").textContent = document.getElementById("mN2").textContent = (NSIM / 1000) + " mil";
 document.querySelectorAll(".mN3").forEach(e => e.textContent = (NSIM / 1000) + " mil");
-document.getElementById("mFin").textContent = "chance do " + (DADOS.meta.fonte_finais || "mercado") + ", ou o campeão que você escolher";
+document.getElementById("mFin").textContent = "chance do mercado (" + (DADOS.meta.fonte_finais || "") + ") ou o campeão que você escolher";
 
 /* estado: escolhas por jogo ("m" | "e" | "v" | [gm, gv]) e finais (null = chance, true/false) */
 const chaveJ = j => j.mandante + " x " + j.visitante;
@@ -434,10 +449,10 @@ function gravaHash() {
 /* finais */
 /* só as finais que ainda não foram jogadas aparecem (pedido do Victor, 22/11: tirar a Sul-Americana depois da final) */
 const NOMEFIN = {sula: "Sul-Americana", lib: "Libertadores"}, ABERTAS = FINAIS.filter(k => DADOS.finais[k].prob > 0 && DADOS.finais[k].prob < 1);
-if (DADOS.finais.sula.prob <= 0) document.getElementById("mSulaV").remove();   // campeão estrangeiro: não mexe nas vagas
+{ const m = document.getElementById("mSulaV"); if (m && DADOS.finais.sula.prob <= 0) m.remove(); }   // campeão estrangeiro: não mexe nas vagas
 if (!ABERTAS.length) document.getElementById("blocoFinais").remove();
 else { document.getElementById("tFinais").textContent = ABERTAS.length === 1 ? "A final" : "As finais";
-  document.getElementById("mudaG").textContent = ABERTAS.length === 1 ? "Muda o tamanho do G." : "Mudam o tamanho do G."; }
+  }
 document.querySelectorAll(".btnSort").forEach(b => b.title = "sorteia um placar para cada jogo que está no Modelo, dia a dia" +
   (ABERTAS.length ? ", e o campeão da " + ABERTAS.map(k => NOMEFIN[k]).join(" e da ") : ""));
 function desenhaFinais() {
@@ -576,7 +591,9 @@ const fecha100 = obj => { const ks = Object.keys(obj).filter(k => obj[k] > 0), d
   let falta = Math.round(ks.reduce((a, k) => a + obj[k], 0) * 10) - base.reduce((a, b) => a + b, 0);
   [...ks.keys()].sort((i, j) => (dec[j] - base[j]) - (dec[i] - base[i])).forEach(i => { if (falta > 0) { base[i]++; falta--; } });
   const r = Object.fromEntries(Object.keys(obj).map(k => [k, "0,0%"])); ks.forEach((k, i) => r[k] = (base[i] / 10).toFixed(1).replace(".", ",") + "%"); return r; };
+const okV = () => { const s = el("span", {class: "ok-v", title: "vaga garantida"}); s.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#1DB954"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'; return s; };
 function desenhaResultado(R) {
+  ULTIMO = R;
   const T = R.tamanho, mx = Math.max(...Object.values(T)), T1 = fecha100(T);
   document.getElementById("gCards").replaceChildren(...[6, 7, 8, 9].filter(g => g < 9 || DADOS.finais.sula.prob > 0).map(g => el("div", {class: "g-card" + (T[g] === mx ? " top" : "")},
     el("span", {class: "r"}, g === 6 ? "Só G6" : "G" + g), el("b", {}, T1[g]), delta(T[g], DADOS.ref_tamanho[g] || 0))));
@@ -586,19 +603,18 @@ function desenhaResultado(R) {
   const tab = document.getElementById("tabSim");
   const th = (t, cls, title) => el("th", {class: cls || "", title: title || ""}, t);
   const cab = el("thead", {}, el("tr", {}, th("#", "n"), th("Clube"), th("P", "n"), th("J", "n"), th("V", "n"), th("E", "n md"), th("D", "n md"),
-    th("GP", "n gpgc md"), th("GC", "n gpgc md"), th("SG", "n sg"), th("Fim", "n fim", "pontos no fim (média dos cenários)"), th("Lib.", "lib"), th("Cai", "n lc cai")));
+    th("GP", "n gpgc md"), th("GC", "n gpgc md"), th("SG", "n sg"), th("Lib.", "lib"), th("Cai", "n lc cai")));
   const corpo = el("tbody");
   const td = (v, k, r, cls) => el("td", {class: "n " + (cls || "")}, el("span", {class: r[k] !== HOJE[r.clube][k] && k === "P" ? "mudou" : ""}, k === "SG" && v > 0 ? "+" + v : v));
   rows.forEach((r, i) => {
     const f = FIM[r.clube], pts = f.ptsMin === f.ptsMax ? String(f.ptsMin) : num1(f.pts);
-    const tr = el("tr", {class: (i >= 16 ? "z4" : "") + (i === 15 ? " corte" : "")},
+    const tr = el("tr", {class: (i >= 16 ? "z4" : i < 4 ? "g4" : "") + (i === 15 ? " corte" : "")},
       el("td", {class: "n"}, i + 1),
       el("td", {}, el("span", {class: "cl", title: r.clube}, escudo(r.clube), el("span", {class: "nm"}, r.clube))),
       td(r.P, "P", r, ""), td(r.J, "J", r), td(r.V, "V", r), td(r.E, "E", r, "md"), td(r.D, "D", r, "md"),
       td(r.GP, "GP", r, "gpgc md"), td(r.GC, "GC", r, "gpgc md"), td(r.SG, "SG", r, "sg"),
-      el("td", {class: "n fim"}, el("b", {}, pts), f.ptsMin !== f.ptsMax ? el("span", {class: "pts-f"}, f.ptsMin + "–" + f.ptsMax) : null),
-      el("td", {class: "lib"}, el("span", {class: "num-c"}, el("span", {class: f.lib === 100 ? "forte" : ""}, pc(f.lib)), delta(f.lib, REF[r.clube].lib))),
-      el("td", {class: "n lc cai"}, el("span", {class: f.cai === 100 && caiuCerto(r, rows) ? "forte" : ""}, f.cai === 100 && !caiuCerto(r, rows) ? ">99%" : pc(f.cai)), delta(f.cai, REF[r.clube].cai, true) || el("span", {class: "dlt"})));
+      el("td", {class: "lib"}, el("span", {class: "num-c"}, f.lib >= 100 ? okV() : f.lib <= 0 ? el("span", {class: "zero"}, "–") : el("span", {class: "forte"}, pc(f.lib)), delta(f.lib, REF[r.clube].lib))),
+      el("td", {class: "n lc cai"}, f.cai >= 100 && caiuCerto(r, rows) ? el("span", {class: "caiu"}, "caiu") : f.cai <= 0 ? el("span", {class: "zero"}, "–") : el("span", {class: f.cai >= 50 ? "caiu" : "", style: "font-weight:700"}, f.cai >= 100 ? ">99%" : pc(f.cai)), delta(f.cai, REF[r.clube].cai, true) || el("span", {class: "dlt"})));
     corpo.append(tr);
   });
   tab.replaceChildren(cab, corpo);
@@ -678,6 +694,79 @@ IRR.onclick = () => { if (RES.classList.contains("oculto")) ocultar(false); RES.
 /* o botão "Ver resultado" só aparece quando a tabela do resultado está fora da tela */
 try { new IntersectionObserver(([e]) => { document.getElementById("irRes").style.visibility = e.isIntersecting ? "hidden" : "visible"; }).observe(document.getElementById("resultado")); } catch (e) {}
 leHash(); desenhaFinais(); desenhaJogos(); muda();
+
+/* imagem para compartilhar (story 1080x1920, feed 1080x1350), desenhada em canvas (pedido do Victor, 26/11) */
+const carregaImg = src => new Promise(ok => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = src; });
+async function imagemSim(fmt) {
+  if (!ULTIMO) return;
+  const W = 1080, H = fmt === "story" ? 1920 : 1350, st = fmt === "story";
+  try { await document.fonts.load("700 40px Poppins"); await document.fonts.load("400 30px Poppins"); } catch (e) {}
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H; const g = cv.getContext("2d");
+  const F = (w, px) => `${w} ${px}px Poppins, Arial, sans-serif`, ROXO = "#400078", TX = "#141414", T2 = "#5C5C5C";
+  g.fillStyle = "#fff"; g.fillRect(0, 0, W, H);
+  g.fillStyle = ROXO; g.fillRect(0, 0, W, 14);
+  const rows = tabelaCarregada(), FIMc = Object.fromEntries(ULTIMO.clubes.map(r => [r.clube, r]));
+  const imgs = {}; await Promise.all(rows.map(async r => { imgs[r.clube] = ESCUDOS[r.clube] ? await carregaImg(ESCUDOS[r.clube]) : null; }));
+  const logo = await carregaImg(LOGO_CAMP), simb = await carregaImg(SIMBOLO);
+  const M = 56; let y = st ? 110 : 80;
+  if (logo) g.drawImage(logo, M, y - 10, st ? 96 : 80, st ? 96 : 80);
+  const xT = M + (st ? 120 : 100);
+  g.fillStyle = TX; g.font = F(700, st ? 62 : 52); g.fillText("Minha simulação", xT, y + (st ? 40 : 34));
+  const nEsc = Object.keys(ESC).length, nTot = DADOS.jogos.length;
+  const fin = FIN.lib == null ? "" : FIN.lib ? " · Palmeiras campeão" : " · Estudiantes campeão";
+  g.fillStyle = T2; g.font = F(400, st ? 30 : 26); g.fillText(`Brasileirão 2026 · ${nEsc} de ${nTot} jogos escolhidos${fin}`, xT, y + (st ? 86 : 72));
+  y += st ? 170 : 130;
+  // tamanho do G
+  const T1 = fecha100(ULTIMO.tamanho);
+  g.font = F(700, st ? 30 : 26); g.fillStyle = TX;
+  const gs = [6, 7, 8].filter(k => (ULTIMO.tamanho[k] || 0) > 0).map(k => `${k === 6 ? "G6" : "G" + k} ${T1[k]}`).join("   ·   ");
+  g.fillText(gs, M, y); y += st ? 46 : 38;
+  // tabela
+  const rh = st ? 66 : 47, cols = {pos: M + 10, esc: M + 70, nome: M + (st ? 124 : 112), P: 640, V: 720, SG: 810, Lib: 920, Cai: W - M - 10};
+  g.font = F(700, st ? 22 : 19); g.fillStyle = T2;
+  const cab = [["#", cols.pos, "left"], ["P", cols.P, "right"], ["V", cols.V, "right"], ["SG", cols.SG, "right"], ["LIB.", cols.Lib, "right"], ["CAI", cols.Cai, "right"]];
+  cab.forEach(([t, x, a]) => { g.textAlign = a; g.fillText(t, x, y); }); g.textAlign = "left";
+  y += 14; g.fillStyle = TX; g.fillRect(M, y, W - 2 * M, 3); y += 3;
+  rows.forEach((r, i) => {
+    const f = FIMc[r.clube], top = y + i * rh;
+    if (i < 4) { g.fillStyle = "#F1EBF6"; g.fillRect(M, top, W - 2 * M, rh); }
+    if (i >= 16) { g.fillStyle = "#FBEDED"; g.fillRect(M, top, W - 2 * M, rh); }
+    g.fillStyle = "#E3E3E3"; g.fillRect(M, top + rh - 1, W - 2 * M, 1);
+    if (i === 15) { g.fillStyle = "#C62828"; g.fillRect(M, top + rh - 2, W - 2 * M, 3); }
+    const cy = top + rh / 2, fs = st ? 28 : 23;
+    g.textBaseline = "middle"; g.fillStyle = T2; g.font = F(700, fs); g.textAlign = "left"; g.fillText(String(i + 1), cols.pos, cy);
+    const es = rh * 0.66, im = imgs[r.clube]; if (im) { const k = Math.min(es / im.width, es / im.height); g.drawImage(im, cols.esc, cy - im.height * k / 2, im.width * k, im.height * k); }
+    g.fillStyle = TX; g.font = F(500, fs); g.fillText(r.clube, cols.nome, cy);
+    g.textAlign = "right"; g.font = F(700, fs); g.fillText(String(r.P), cols.P, cy);
+    g.font = F(400, fs); g.fillText(String(r.V), cols.V, cy); g.fillText((r.SG > 0 ? "+" : "") + r.SG, cols.SG, cy);
+    // Lib.
+    if (f.lib >= 100) { g.fillStyle = "#1DB954"; g.beginPath(); g.arc(cols.Lib - 14, cy, 14, 0, 7); g.fill(); g.strokeStyle = "#fff"; g.lineWidth = 3.5; g.beginPath(); g.moveTo(cols.Lib - 21, cy + 1); g.lineTo(cols.Lib - 16, cy + 6); g.lineTo(cols.Lib - 7, cy - 5); g.stroke(); }
+    else { g.fillStyle = f.lib <= 0 ? "#B5B5B5" : ROXO; g.font = F(700, fs); g.fillText(f.lib <= 0 ? "–" : pc(f.lib), cols.Lib, cy); }
+    // Cai
+    const caiu = f.cai >= 100 && caiuCerto(r, rows);
+    g.fillStyle = caiu || f.cai >= 50 ? "#C62828" : f.cai <= 0 ? "#B5B5B5" : TX; g.font = F(700, fs);
+    g.fillText(caiu ? "caiu" : f.cai <= 0 ? "–" : f.cai >= 100 ? ">99%" : pc(f.cai), cols.Cai, cy);
+    g.textAlign = "left"; g.textBaseline = "alphabetic";
+  });
+  // rodapé
+  const yb = H - (st ? 70 : 48);
+  if (simb) g.drawImage(simb, W - M - (st ? 56 : 44), yb - (st ? 40 : 32), st ? 56 : 44, st ? 56 : 44);
+  g.fillStyle = TX; g.font = F(700, st ? 28 : 23); g.fillText("@vcanedo", M, yb - (st ? 8 : 6));
+  g.fillStyle = T2; g.font = F(400, st ? 22 : 18); g.fillText("Faça a sua: vcanedo88.github.io/simulador-brasileirao", M, yb + (st ? 26 : 20));
+  // mostra e oferece baixar / compartilhar
+  const url = cv.toDataURL("image/png"), nome = `simulacao-brasileirao-${fmt}.png`;
+  const m = el("div", {class: "img-modal", role: "dialog", "aria-label": "Imagem da simulação"});
+  const a = el("a", {class: "btn pri", href: url, download: nome}, "Baixar");
+  const fecha = el("button", {class: "btn", type: "button"}, "Fechar"); fecha.onclick = () => m.remove();
+  const acoes = el("div", {class: "acoes"}, a, fecha);
+  try { const blob = await (await fetch(url)).blob(), file = new File([blob], nome, {type: "image/png"});
+    if (navigator.canShare && navigator.canShare({files: [file]})) { const sh = el("button", {class: "btn", type: "button"}, "Compartilhar"); sh.onclick = () => navigator.share({files: [file]}).catch(() => {}); acoes.prepend(sh); } } catch (e) {}
+  m.append(el("div", {class: "box"}, el("img", {src: url, alt: "tabela desta simulação"}), acoes, el("p", {}, "No celular, se o botão não baixar, toque e segure na imagem para salvar.")));
+  m.onclick = e => { if (e.target === m) m.remove(); };
+  document.body.append(m);
+}
+document.getElementById("btnStory").onclick = () => imagemSim("story");
+document.getElementById("btnFeed").onclick = () => imagemSim("feed");
 </script>
 </body>
 </html>
