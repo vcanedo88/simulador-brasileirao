@@ -257,11 +257,12 @@ html.modo-video .video-nav:hover{opacity:1}
 .trilho.dup i{display:block;height:100%}
 .trilho.dup i.g{background:var(--roxo)}
 .trilho.dup i.p{background:var(--s3)}
-.barra.lib{grid-template-columns:26px 120px minmax(0,1fr) 52px 44px 48px 70px}
+.barra.lib{grid-template-columns:30px 26px 120px minmax(0,1fr) 52px 44px 48px 36px}
+.barra.lib .pos{font-size:13px;font-weight:700;color:var(--texto-2);text-align:left!important;font-variant-numeric:tabular-nums}.barra.lib .pts{text-align:right}
 .barra.lib .num{text-align:right;font-variant-numeric:tabular-nums;font-size:13px}
 .barra.lib .num.g{color:var(--roxo);font-weight:700}.barra.lib .num.p{color:var(--s4);font-weight:700}
 .barra.lib.cab{font-size:11px;color:var(--texto-2);text-transform:uppercase;letter-spacing:.04em}.barra.lib.cab span{text-align:right}
-@media (max-width:600px){.barra.lib{grid-template-columns:24px 84px minmax(0,1fr) 44px 38px 42px;gap:6px}.barra.lib .pts{display:none}}
+@media (max-width:600px){.barra.lib{grid-template-columns:26px 24px 76px minmax(0,1fr) 42px 36px 40px;gap:5px}.barra.lib .pts{display:none}}
 .kpi .g-lbl{font-size:13px;font-weight:700;color:var(--texto-2);letter-spacing:.04em}
 .cen{display:flex;flex-direction:column;gap:0}
 .cen-cab,.cen-l{display:grid;grid-template-columns:repeat(3,64px) 70px minmax(0,1fr);gap:8px;align-items:center}
@@ -596,15 +597,15 @@ function evolucao(id, linhas, valor, rotLinha, tip, certoUlt) {
 
 /* chance */
 const CL = DADOS.clubes.filter(r => r.lib > 0).sort((a, b) => b.lib - a.lib);   // todos com alguma chance (o São Paulo entra com <1%)
-const cabLib = el("div", {class: "barra lib cab"}, el("span", {}), el("span", {}), el("span", {}), el("span", {}, "Grupos"), el("span", {}, "Pré"), el("span", {}, "Total"), el("span", {class: "pts"}));
+const cabLib = el("div", {class: "barra lib cab"}, el("span", {class: "pos"}, "#"), el("span", {}), el("span", {}), el("span", {}), el("span", {}, "Grupos"), el("span", {}, "Pré"), el("span", {}, "Total"), el("span", {class: "pts"}, "Pts"));
 document.getElementById("chance").replaceChildren(cabLib, ...CL.map(r => el("div", {class: "barra lib"},
-  escudo(r.clube, "esc"), el("span", {}, NOME(r.clube)),
+  el("span", {class: "pos"}, r.posicao + "º"), escudo(r.clube, "esc"), el("span", {}, NOME(r.clube)),
   el("div", {class: "trilho dup", title: `grupos ${pc(r.grupos)} · pré ${pc(r.pre)}`}, el("i", {class: "g", style: `width:${r.grupos}%`}), el("i", {class: "p", style: `width:${r.pre}%`})),
   el("span", {class: "num g"}, r.grupos_garantido ? certo("fase de grupos garantida pela matemática") : r.grupos === 0 ? "–" : pc(r.grupos)),
   el("span", {class: "num p"}, r.grupos_garantido || r.pre === 0 ? "–" : pc(r.pre)),
   el("b", {},
     r.garantido ? certo(r.grupos_garantido ? "fase de grupos garantida pela matemática" : "Libertadores garantida pela matemática") : pc(r.lib)),
-  el("span", {class: "pts"}, `${r.pontos} pts · ${r.posicao}º`))));
+  el("span", {class: "pts"}, `${r.pontos}`))));
 
 /* como termina */
 const ULT = DADOS.ultimo.mediana;
@@ -619,7 +620,7 @@ function desenhaFinal() {
   for (let p = lo; p <= hi; p += passo) svg.append(sv("text", {x: x(p), y: 14, "text-anchor": "middle", "font-size": 12, fill: "#5C5C5C"}, p));
   const tip = tipDe(box);
   rows.forEach((r, i) => {
-    const y = top + i * rh + rh / 2, foco = r.lib > 2 && r.lib < 98;
+    const y = top + i * rh + rh / 2, foco = !r.garantido && r.lib > 0;   // fundo roxo: todos que ainda disputam vaga pela tabela
     const g = sv("g", {});
     g.append(sv("rect", {x: 0, y: y - rh / 2, width: W, height: rh, fill: foco ? "#F1EBF6" : "transparent"}));
     g.append(sv("image", {href: ESCUDOS[r.clube] || "", x: 4, y: y - 11, width: 22, height: 22}), sv("text", {x: 34, y: y + 4.5, "font-size": 13, fill: "#141414", "font-weight": 500}, NOME(r.clube)));
